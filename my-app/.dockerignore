@@ -1,0 +1,11 @@
+# Node
+node_modules
+.next
+
+# Env files — never bake secrets into image
+.env*
+
+# Dev / editor
+.DS_Store
+AGENTS.md
+CLAUDE.md
