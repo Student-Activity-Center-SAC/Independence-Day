@@ -110,9 +110,9 @@ export default function AdminPage() {
   // Auto-refresh every 30s
   useEffect(() => {
     if (!key) return;
-    fetchStats(key);
+    const t = setTimeout(() => fetchStats(key), 0);
     const id = setInterval(() => fetchStats(key), 30000);
-    return () => clearInterval(id);
+    return () => { clearTimeout(t); clearInterval(id); };
   }, [key, fetchStats]);
 
   const handleLogin = (e: React.FormEvent) => {
