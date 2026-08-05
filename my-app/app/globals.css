@@ -1,0 +1,152 @@
+@import "tailwindcss";
+
+:root {
+  --saffron: #FF9933;
+  --india-green: #138808;
+  --chakra-blue: #000080;
+  --bg-dark: #07070E;
+  --bg-card: #0F0F1A;
+  --bg-card-hover: #181828;
+  --text-primary: #F0EFE8;
+  --text-secondary: #8888A8;
+  --border-subtle: rgba(255, 153, 51, 0.12);
+}
+
+@theme inline {
+  --color-background: var(--bg-dark);
+  --color-foreground: var(--text-primary);
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-cinzel);
+}
+
+* { box-sizing: border-box; }
+
+html {
+  scroll-behavior: auto;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--bg-dark);
+  color: var(--text-primary);
+  overflow-x: hidden;
+  font-family: var(--font-inter), system-ui, sans-serif;
+}
+
+/* Prevent iOS auto-zoom on input focus (requires font-size >= 16px) */
+@media screen and (max-width: 639px) {
+  input, select, textarea {
+    font-size: 16px;
+  }
+}
+
+/* Remove tap highlight on interactive elements */
+button, a, [role="button"] {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: var(--bg-dark); }
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #FF9933 0%, #138808 100%);
+  border-radius: 2px;
+}
+
+.gradient-text-tri {
+  background: linear-gradient(135deg, #FF9933 0%, #FFFDF0 50%, #138808 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-text-saffron {
+  background: linear-gradient(135deg, #FF9933 0%, #FFB347 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.card-glass {
+  background: rgba(15, 15, 26, 0.7);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 153, 51, 0.1);
+}
+
+.card-glass:hover {
+  border-color: rgba(255, 153, 51, 0.3);
+}
+
+.saffron-glow-text {
+  text-shadow: 0 0 60px rgba(255, 153, 51, 0.4);
+}
+
+.tricolor-line {
+  height: 3px;
+  background: linear-gradient(90deg, #FF9933 33.33%, #FFFFFF 33.33% 66.66%, #138808 66.66%);
+}
+
+/* Ashoka Chakra CSS animation */
+@keyframes chakra-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.chakra-spin {
+  animation: chakra-spin 20s linear infinite;
+}
+
+.chakra-spin-slow {
+  animation: chakra-spin 40s linear infinite;
+}
+
+/* Floating animation */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-12px); }
+}
+.float-anim { animation: float 4s ease-in-out infinite; }
+
+/* Pulse glow */
+@keyframes pulse-saffron {
+  0%, 100% { box-shadow: 0 0 20px rgba(255, 153, 51, 0.3); }
+  50% { box-shadow: 0 0 50px rgba(255, 153, 51, 0.7); }
+}
+.pulse-saffron { animation: pulse-saffron 2s ease-in-out infinite; }
+
+/* Scroll indicator */
+@keyframes scroll-bounce {
+  0%, 100% { transform: translateY(0); opacity: 1; }
+  50% { transform: translateY(8px); opacity: 0.5; }
+}
+.scroll-bounce { animation: scroll-bounce 1.5s ease-in-out infinite; }
+
+/* Star/particle shimmer */
+@keyframes shimmer {
+  0% { opacity: 0.3; }
+  50% { opacity: 1; }
+  100% { opacity: 0.3; }
+}
+
+/* Hero entrance — CSS-only, immune to React strict-mode double-mount */
+@keyframes hero-fade-up {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes hero-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.hero-enter-1  { animation: hero-fade-in  0.8s cubic-bezier(0.22,1,0.36,1) 0.35s both; }
+.hero-enter-2  { animation: hero-fade-up  1.0s cubic-bezier(0.22,1,0.36,1) 0.55s both; }
+.hero-enter-3  { animation: hero-fade-up  0.9s cubic-bezier(0.22,1,0.36,1) 0.85s both; }
+.hero-enter-4  { animation: hero-fade-up  0.9s cubic-bezier(0.22,1,0.36,1) 1.10s both; }
+.hero-enter-5  { animation: hero-fade-up  0.8s cubic-bezier(0.22,1,0.36,1) 1.30s both; }
+
+/* Navbar slide-down entrance */
+@keyframes nav-slide-down {
+  from { opacity: 0; transform: translateY(-80px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.navbar-enter { animation: nav-slide-down 0.9s cubic-bezier(0.22,1,0.36,1) 0.1s both; }
