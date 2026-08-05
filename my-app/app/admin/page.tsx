@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import AshokaCss from "@/components/AshokaCss";
+import * as XLSX from "xlsx";
 
 /* ── Types ── */
 interface Stats {
@@ -205,6 +206,30 @@ export default function AdminPage() {
     const a = document.createElement("a"); a.href = url; a.download = "registrations.csv"; a.click();
   };
 
+  const exportXLSX = () => {
+    const headers = ["ID", "Name", "Email", "Phone", "Roll No", "Department", "Year", "Competition", "Registered At"];
+    const rows = filtered.map((r) => [r.id, r.name, r.email, r.phone, r.roll_number, r.department, r.year, r.competition, r.registered_at]);
+
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+
+    // Column widths
+    ws["!cols"] = [
+      { wch: 6 },  // ID
+      { wch: 22 }, // Name
+      { wch: 30 }, // Email
+      { wch: 14 }, // Phone
+      { wch: 14 }, // Roll No
+      { wch: 16 }, // Department
+      { wch: 10 }, // Year
+      { wch: 22 }, // Competition
+      { wch: 22 }, // Registered At
+    ];
+
+    XLSX.utils.book_append_sheet(wb, ws, "Registrations");
+    XLSX.writeFile(wb, `registrations_${new Date().toISOString().slice(0, 10)}.xlsx`);
+  };
+
   return (
     <div className="min-h-screen bg-[#07070E] text-white">
       {/* ── Header ── */}
@@ -321,12 +346,19 @@ export default function AdminPage() {
               >
                 {competitions.map((c) => <option key={c} value={c} className="bg-[#0F0F1A]">{c}</option>)}
               </select>
-              {/* Export */}
+              {/* Export CSV */}
               <button
                 onClick={exportCSV}
                 className="text-xs px-3 py-2 rounded-lg border border-[#138808]/40 text-[#138808] hover:bg-[#138808]/10 transition-all font-medium"
               >
-                ↓ Export CSV
+                ↓ CSV
+              </button>
+              {/* Export XLSX */}
+              <button
+                onClick={exportXLSX}
+                className="text-xs px-3 py-2 rounded-lg border border-[#FF9933]/40 text-[#FF9933] hover:bg-[#FF9933]/10 transition-all font-medium"
+              >
+                ↓ XLSX
               </button>
             </div>
           </div>
