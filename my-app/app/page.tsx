@@ -20,9 +20,8 @@ function useCountdown(target: Date) {
     };
   };
   /* Start with zeros — SSR and initial client render match; real values set in effect */
-  const [cd, setCd] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+  const [cd, setCd] = useState(() => calc());
   useEffect(() => {
-    setCd(calc());
     const id = setInterval(() => setCd(calc()), 1000);
     return () => clearInterval(id);
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -33,12 +32,12 @@ function useCountdown(target: Date) {
 /* ─── data ─── */
 const timeline = [
   { year: "1857", title: "First War of Independence", icon: "⚔️", color: "#FF9933", desc: "The Great Revolt of 1857 became the first major uprising against British colonial rule, igniting the flame of independence across India." },
-  { year: "1905", title: "Partition of Bengal & Swadeshi", icon: "🔥", color: "#FFB347", desc: "Lord Curzon's partition of Bengal sparked the Swadeshi movement — a powerful economic and cultural resistance that united Indians." },
+  { year: "1905", title: "Partition of Bengal & Swadeshi", icon: "🔥", color: "#FF9933", desc: "Lord Curzon's partition of Bengal sparked the Swadeshi movement — a powerful economic and cultural resistance that united Indians." },
   { year: "1919", title: "Jallianwala Bagh Massacre", icon: "🕯️", color: "#FF9933", desc: "The massacre at Amritsar fuelled nationwide outrage and strengthened the resolve for complete independence under Mahatma Gandhi." },
-  { year: "1930", title: "Dandi Salt March", icon: "🚶", color: "#138808", desc: "Gandhi led 240 miles to the sea in defiance of the Salt Tax — one of the most iconic acts of civil disobedience in history." },
+  { year: "1930", title: "Dandi Salt March", icon: "🚶", color: "#FFFFFF", desc: "Gandhi led 240 miles to the sea in defiance of the Salt Tax — one of the most iconic acts of civil disobedience in history." },
   { year: "1942", title: "Quit India Movement", icon: "✊", color: "#138808", desc: "'Do or Die' — Gandhi's clarion call electrified the nation. Millions took to the streets demanding immediate British withdrawal." },
-  { year: "1947", title: "Independence at Midnight", icon: "🇮🇳", color: "#FF9933", desc: "At the stroke of midnight on 15 August 1947, India awoke to life and freedom. Nehru's 'Tryst with Destiny' speech echoed through history." },
-  { year: "2026", title: "80th Independence Day", icon: <AshokaCss size={32} color="#FFD700" />, color: "#FFD700", desc: "KL University honors 80 glorious years of freedom with pride, creativity, competitions, and the spirit of a new India." },
+  { year: "1947", title: "Independence at Midnight", icon: "🇮🇳", color: "#138808", desc: "At the stroke of midnight on 15 August 1947, India awoke to life and freedom. Nehru's 'Tryst with Destiny' speech echoed through history." },
+  { year: "2026", title: "80th Independence Day", icon: <AshokaCss size={32} color="#138808" />, color: "#138808", desc: "KL University honors 80 glorious years of freedom with pride, creativity, competitions, and the spirit of a new India." },
 ];
 
 const stats = [
@@ -214,14 +213,14 @@ export default function HomePage() {
               <FadeIn>
                 <p className="text-[10px] tracking-[0.3em] text-[#FF9933] uppercase font-semibold mb-4">About the Celebration</p>
                 <h2 className="font-[family-name:var(--font-cinzel)] text-4xl sm:text-5xl font-black text-white mb-6 leading-tight">
-                  India's 80 Years of{" "}
+                  India&apos;s 80 Years of{" "}
                   <span className="gradient-text-tri">Sovereignty</span>
                 </h2>
                 <p className="text-[#8888A8] leading-relaxed mb-5">
                   Independence Day is celebrated every 15 August — the day India officially became independent from British colonialism in 1947, ending nearly 200 years of foreign rule. The day is marked by flag hoisting, parades, and cultural programs from the Red Fort to every corner of the nation.
                 </p>
                 <p className="text-[#8888A8] leading-relaxed mb-8">
-                  KL University's Student Activity Centre (SAC) celebrates this milestone with a week-long series of competitions, performances, and events — uniting students in the spirit of Unity, Patriotism, Leadership, Creativity, and Nation Building.
+                  KL University&apos;s Student Activity Centre (SAC) celebrates this milestone with a week-long series of competitions, performances, and events — uniting students in the spirit of Unity, Patriotism, Leadership, Creativity, and Nation Building.
                 </p>
                 <div className="space-y-3">
                   {[
@@ -308,10 +307,10 @@ export default function HomePage() {
               <p className="relative text-[10px] tracking-[0.5em] text-[#FF9933] uppercase font-semibold mb-5 font-[family-name:var(--font-cinzel)]">
                 ✦ Road to Freedom ✦
               </p>
-              <h2 className="relative font-[family-name:var(--font-cinzel)] font-black leading-[0.9] text-white">
-                <span className="block text-4xl sm:text-6xl lg:text-8xl mb-1">India's</span>
-                <span className="block text-5xl sm:text-7xl lg:text-9xl gradient-text-tri">Historic</span>
-                <span className="block text-4xl sm:text-6xl lg:text-8xl text-white/80">Journey</span>
+              <h2 className="relative font-[family-name:var(--font-cinzel)] font-black leading-[0.9]">
+                <span className="block text-4xl sm:text-6xl lg:text-8xl mb-1 text-[#FF9933]">India&apos;s</span>
+                <span className="block text-5xl sm:text-7xl lg:text-9xl text-white">Historic</span>
+                <span className="block text-4xl sm:text-6xl lg:text-8xl text-[#138808]">Journey</span>
               </h2>
               <div className="flex items-center justify-center gap-3 mt-8">
                 <div className="h-px w-16 bg-gradient-to-r from-transparent to-[#FF9933]" />
@@ -397,7 +396,7 @@ export default function HomePage() {
               Celebrate with <span className="gradient-text-tri">Us</span>
             </h2>
             <p className="text-[#8888A8] text-base sm:text-lg leading-relaxed mb-10 max-w-xl mx-auto">
-              Join competitions, showcase your talent, and earn certificates. Let's celebrate 80 years of freedom together as one!
+              Join competitions, showcase your talent, and earn certificates. Let&apos;s celebrate 80 years of freedom together as one!
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link href="/register" className="px-10 py-4 rounded-full bg-gradient-to-r from-[#FF9933] to-[#e68000] text-black font-bold tracking-wide hover:shadow-[0_0_35px_rgba(255,153,51,0.4)] hover:-translate-y-1 transition-all duration-300 text-center">
