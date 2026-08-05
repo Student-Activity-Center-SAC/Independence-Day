@@ -238,11 +238,11 @@ export default function HomePage() {
             </div>
 
             <FadeIn delay={0.2}>
-              <div className="relative flex justify-center px-6 sm:px-0">
+              <div className="relative flex justify-center sm:px-0 -mx-4 sm:mx-0">
                 {/* Glow behind flag */}
                 <div className="absolute inset-0 bg-gradient-to-r from-[rgba(255,153,51,0.1)] to-[rgba(19,136,8,0.1)] blur-3xl -z-10 scale-125" />
 
-                <div className="relative w-full max-w-[420px] sm:max-w-[480px]">
+                <div className="relative w-full max-w-[360px] sm:max-w-[480px]">
                   <WavingFlag className="w-full" />
 
                   {/* Floating badge — 80 Years of Pride */}

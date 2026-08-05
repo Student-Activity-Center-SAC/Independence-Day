@@ -125,18 +125,16 @@ export default function Navbar() {
             exit={{ opacity: 0, height: 0 }}
             className="md:hidden bg-[#07070E]/96 backdrop-blur-2xl border-t border-white/8 px-6 pb-6 pt-4 flex flex-col gap-4"
           >
-            {/* Logo in drawer header */}
-            {scrolled && (
-              <div className="flex items-center gap-3 pb-3 border-b border-white/8">
-                <div className="relative w-14 h-14">
-                  <Image src="/sac_logo.png" alt="SAC KL University" fill className="object-contain" />
-                </div>
-                <div>
-                  <p className="text-[10px] tracking-[0.2em] text-[#FF9933] font-semibold uppercase font-[family-name:var(--font-cinzel)]">KL University · SAC</p>
-                  <p className="text-xs font-bold text-white font-[family-name:var(--font-cinzel)]">Independence Day 2026</p>
-                </div>
+            {/* Logo always at top of drawer */}
+            <div className="flex items-center gap-3 pb-3 border-b border-white/8">
+              <div className="relative w-12 h-12 shrink-0">
+                <Image src="/sac_logo.png" alt="SAC KL University" fill className="object-contain" />
               </div>
-            )}
+              <div>
+                <p className="text-[10px] tracking-[0.2em] text-[#FF9933] font-semibold uppercase font-[family-name:var(--font-cinzel)]">KL University · SAC</p>
+                <p className="text-xs font-bold text-white font-[family-name:var(--font-cinzel)]">Independence Day 2026</p>
+              </div>
+            </div>
             {links.map(({ href, label }) => (
               <Link
                 key={href}
