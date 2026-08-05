@@ -90,6 +90,7 @@ export default function AdminPage() {
   const [filterComp, setFilterComp] = useState("All");
   const [sortField, setSortField] = useState<"registered_at" | "name" | "competition">("registered_at");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
+  const [deletingId, setDeletingId] = useState<number | null>(null);
 
   const fetchStats = useCallback(async (adminKey: string) => {
     setLoading(true);
@@ -106,6 +107,21 @@ export default function AdminPage() {
       setLoading(false);
     }
   }, []);
+
+  const handleDelete = async (id: number) => {
+    if (!confirm("Delete this registration? This cannot be undone.")) return;
+    setDeletingId(id);
+    try {
+      const res = await fetch(`/api/admin/registrations/${id}?key=${encodeURIComponent(key)}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Failed");
+      // Remove locally for instant feedback, full refresh follows
+      setStats((prev) => prev ? { ...prev, total: prev.total - 1, recent: prev.recent.filter((r) => r.id !== id) } : prev);
+    } catch {
+      alert("Failed to delete registration");
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   // Auto-refresh every 30s
   useEffect(() => {
@@ -397,12 +413,13 @@ export default function AdminPage() {
                   >
                     Registered At {sortField === "registered_at" ? (sortDir === "asc" ? "↑" : "↓") : ""}
                   </th>
+                  <th className="px-5 py-3 text-left font-medium text-red-400/60">Delete</th>
                 </tr>
               </thead>
               <tbody>
                 {filtered.length === 0 ? (
                   <tr>
-                    <td colSpan={9} className="px-5 py-16 text-center text-[#8888A8] text-sm">
+                    <td colSpan={10} className="px-5 py-16 text-center text-[#8888A8] text-sm">
                       {stats?.total === 0 ? "No registrations yet 🎉" : "No results match your search"}
                     </td>
                   </tr>
@@ -434,6 +451,15 @@ export default function AdminPage() {
                         </span>
                       </td>
                       <td className="px-5 py-3.5 text-[#8888A8] text-xs whitespace-nowrap">{r.registered_at}</td>
+                      <td className="px-5 py-3.5">
+                        <button
+                          onClick={() => handleDelete(r.id)}
+                          disabled={deletingId === r.id}
+                          className="text-[10px] px-2.5 py-1 rounded-lg border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                        >
+                          {deletingId === r.id ? "…" : "Delete"}
+                        </button>
+                      </td>
                     </tr>
                   ))
                 )}
