@@ -3,6 +3,7 @@ import { Cinzel, Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import SmoothScroll from "@/components/SmoothScroll";
+import AuthProvider from "@/components/AuthProvider";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -33,10 +34,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <link rel="preload" href="https://nischalsingana.com/0805.mp4" as="video" type="video/mp4" />
       </head>
       <body className="bg-[#07070E] text-[#F0EFE8] overflow-x-hidden">
-        <SmoothScroll>
-          <Navbar />
-          <main>{children}</main>
-        </SmoothScroll>
+        <AuthProvider>
+          <SmoothScroll>
+            <Navbar />
+            <main>{children}</main>
+          </SmoothScroll>
+        </AuthProvider>
       </body>
     </html>
   );

@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
+import { useSession, signOut } from "next-auth/react";
 
 const links = [
   { href: "/", label: "Home" },
@@ -16,6 +17,7 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+  const { data: session } = useSession();
 
   useEffect(() => {
     if (pathname === "/admin") return;
@@ -89,12 +91,29 @@ export default function Navbar() {
             </Link>
           ))}
 
-          <Link
-            href="/register"
-            className="ml-2 px-5 py-2 text-sm font-bold rounded-full border border-[#FF9933] text-[#FF9933] hover:bg-[#FF9933] hover:text-black transition-all duration-300 hover:shadow-[0_0_20px_rgba(255,153,51,0.4)]"
-          >
-            Register Now
-          </Link>
+          {session ? (
+            <div className="ml-2 flex items-center gap-2">
+              <Link
+                href="/my-activities"
+                className={`text-sm font-medium tracking-wide transition-colors duration-300 ${pathname === "/my-activities" ? "text-[#FF9933]" : "text-white/60 hover:text-white"}`}
+              >
+                My Activities
+              </Link>
+              <button
+                onClick={() => signOut({ callbackUrl: "/" })}
+                className="px-4 py-2 text-sm font-bold rounded-full border border-white/15 text-white/60 hover:text-white hover:border-white/35 transition-all duration-300"
+              >
+                Sign Out
+              </button>
+            </div>
+          ) : (
+            <Link
+              href="/login"
+              className="ml-2 px-5 py-2 text-sm font-bold rounded-full border border-[#FF9933] text-[#FF9933] hover:bg-[#FF9933] hover:text-black transition-all duration-300 hover:shadow-[0_0_20px_rgba(255,153,51,0.4)]"
+            >
+              Login
+            </Link>
+          )}
         </nav>
 
         {/* Mobile hamburger */}
@@ -147,13 +166,31 @@ export default function Navbar() {
                 {label}
               </Link>
             ))}
-            <Link
-              href="/register"
-              onClick={() => setOpen(false)}
-              className="mt-1 py-3 text-center font-bold rounded-full bg-gradient-to-r from-[#FF9933] to-[#e68000] text-black text-sm"
-            >
-              Register Now
-            </Link>
+            {session ? (
+              <div className="mt-1 space-y-2">
+                <Link
+                  href="/my-activities"
+                  onClick={() => setOpen(false)}
+                  className="block py-3 text-center font-bold rounded-full bg-gradient-to-r from-[#FF9933] to-[#e68000] text-black text-sm"
+                >
+                  My Activities
+                </Link>
+                <button
+                  onClick={() => { setOpen(false); signOut({ callbackUrl: "/" }); }}
+                  className="w-full py-3 text-center font-semibold rounded-full border border-white/15 text-white/60 text-sm"
+                >
+                  Sign Out
+                </button>
+              </div>
+            ) : (
+              <Link
+                href="/login"
+                onClick={() => setOpen(false)}
+                className="mt-1 py-3 text-center font-bold rounded-full bg-gradient-to-r from-[#FF9933] to-[#e68000] text-black text-sm block"
+              >
+                Login
+              </Link>
+            )}
           </motion.nav>
         )}
       </AnimatePresence>

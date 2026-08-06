@@ -1,8 +1,10 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSearchParams } from "next/navigation";
+import { useSession } from "next-auth/react";
+import Link from "next/link";
 import AshokaCss from "@/components/AshokaCss";
 
 const competitions = [
@@ -130,6 +132,7 @@ const inputCls = (err: boolean) =>
 function RegisterInner() {
   const searchParams = useSearchParams();
   const preComp = searchParams.get("competition") ?? "";
+  const { data: session, status: authStatus } = useSession();
 
   const [step, setStep] = useState<Step>(1);
   const [form, setForm] = useState<FormData>({ ...EMPTY, competition: preComp });
@@ -138,6 +141,33 @@ function RegisterInner() {
   const [submitError, setSubmitError] = useState("");
   const [deptOther, setDeptOther] = useState(false);
   const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [profileLoaded, setProfileLoaded] = useState(false);
+
+  useEffect(() => {
+    if (authStatus !== "authenticated") return;
+    fetch("/api/profile")
+      .then((r) => r.json())
+      .then((d) => {
+        const u = d.user;
+        if (u?.profile_complete) {
+          const [cc, ...rest] = (u.phone ?? "+91 ").split(" ");
+          setForm((f) => ({
+            ...f,
+            name: session?.user?.name ?? f.name,
+            email: session?.user?.email ?? f.email,
+            idNumber: u.id_number ?? f.idNumber,
+            countryCode: cc ?? "+91",
+            phone: rest.join("") ?? f.phone,
+            department: u.department ?? f.department,
+            year: u.year ?? f.year,
+            gender: u.gender ?? f.gender,
+            accommodation: u.accommodation ?? f.accommodation,
+          }));
+          setProfileLoaded(true);
+        }
+      })
+      .catch(() => {});
+  }, [authStatus, session]);
 
   const touch = (k: string) => () => setTouched((t) => ({ ...t, [k]: true }));
 
@@ -263,18 +293,28 @@ function RegisterInner() {
             Your E-Certificate will be automatically generated after successful verification of
             participation.
           </p>
-          <button
-            onClick={() => {
-              setSubmitted(false);
-              setForm({ ...EMPTY });
-              setStep(1);
-              setTouched({});
-              setDeptOther(false);
-            }}
-            className="px-8 py-3 rounded-full border border-[#FF9933]/40 text-[#FF9933] text-sm font-semibold hover:bg-[#FF9933]/10 transition-colors"
-          >
-            Register for another event
-          </button>
+          <div className="flex flex-col sm:flex-row items-center gap-3 justify-center">
+            <button
+              onClick={() => {
+                setSubmitted(false);
+                setForm({ ...EMPTY });
+                setStep(1);
+                setTouched({});
+                setDeptOther(false);
+              }}
+              className="px-8 py-3 rounded-full border border-[#FF9933]/40 text-[#FF9933] text-sm font-semibold hover:bg-[#FF9933]/10 transition-colors"
+            >
+              Register for another event
+            </button>
+            {authStatus === "authenticated" && (
+              <Link
+                href="/my-activities"
+                className="px-8 py-3 rounded-full bg-gradient-to-r from-[#138808] to-[#0d6b06] text-white text-sm font-semibold hover:shadow-[0_0_18px_rgba(19,136,8,0.35)] transition-all"
+              >
+                View My Activities →
+              </Link>
+            )}
+          </div>
         </motion.div>
       </div>
     );
@@ -283,6 +323,30 @@ function RegisterInner() {
   return (
     <div className="min-h-screen pt-24 pb-16 px-6 bg-[#07070E]">
       <div className="max-w-xl mx-auto">
+        {/* Auth banner */}
+        {authStatus === "unauthenticated" && (
+          <div className="mb-6 px-4 py-3.5 rounded-xl bg-[#FF9933]/8 border border-[#FF9933]/20 flex items-center justify-between gap-3">
+            <p className="text-[#A0A0B8] text-xs leading-relaxed">
+              <span className="text-[#FF9933] font-semibold">Login faster</span> — sign in with your KLU email to auto-fill your details.
+            </p>
+            <Link href="/login?from=/register" className="shrink-0 text-xs px-3 py-1.5 rounded-lg bg-[#FF9933] text-black font-bold hover:bg-[#e68000] transition-colors">
+              Login
+            </Link>
+          </div>
+        )}
+        {authStatus === "authenticated" && profileLoaded && (
+          <div className="mb-6 px-4 py-3 rounded-xl bg-[#138808]/8 border border-[#138808]/20 flex items-center gap-3">
+            <div className="w-7 h-7 rounded-full bg-[#138808]/20 border border-[#138808]/40 flex items-center justify-center text-[#138808] font-bold text-xs shrink-0">
+              {session?.user?.name?.[0]?.toUpperCase()}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-white text-xs font-semibold truncate">{session?.user?.name}</p>
+              <p className="text-[#8888A8] text-[10px]">Details pre-filled from your profile</p>
+            </div>
+            <Link href="/my-activities" className="shrink-0 text-[10px] text-[#138808] hover:underline">My Activities</Link>
+          </div>
+        )}
+
         {/* Header */}
         <div className="text-center mb-10 hero-enter-2">
           {/* Animated India Flag */}
