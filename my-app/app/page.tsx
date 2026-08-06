@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useSyncExternalStore } from "react";
+import { useRef, useState, useEffect } from "react";
 import { motion, useInView, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import AshokaCss from "@/components/AshokaCss";
@@ -8,32 +8,24 @@ import ParticleCanvas from "@/components/ParticleCanvas";
 import WavingFlag from "@/components/WavingFlag";
 
 /* ─── countdown ─── */
-// subscribe: drives a 1-second tick; stable reference defined outside the hook
-function subscribeToTick(callback: () => void) {
-  const id = setInterval(callback, 1000);
-  return () => clearInterval(id);
-}
-const ZEROS = { days: 0, hours: 0, minutes: 0, seconds: 0 };
-
 function useCountdown(target: Date) {
-  // useSyncExternalStore is React's idiomatic API for external system subscriptions.
-  // - subscribe: wires up the 1-second interval
-  // - getSnapshot: returns live values on the client
-  // - getServerSnapshot: returns zeros so SSR HTML matches initial client render
-  return useSyncExternalStore(
-    subscribeToTick,
-    () => {
+  const [cd, setCd] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+  useEffect(() => {
+    function calc() {
       const diff = target.getTime() - Date.now();
-      if (diff <= 0) return ZEROS;
+      if (diff <= 0) return { days: 0, hours: 0, minutes: 0, seconds: 0 };
       return {
         days: Math.floor(diff / 86400000),
         hours: Math.floor((diff % 86400000) / 3600000),
         minutes: Math.floor((diff % 3600000) / 60000),
         seconds: Math.floor((diff % 60000) / 1000),
       };
-    },
-    () => ZEROS,
-  );
+    }
+    setCd(calc());
+    const id = setInterval(() => setCd(calc()), 1000);
+    return () => clearInterval(id);
+  }, []); // eslint-disable-line
+  return cd;
 }
 
 /* ─── data ─── */
