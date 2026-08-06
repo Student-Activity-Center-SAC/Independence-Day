@@ -16,20 +16,29 @@ function subscribeToTick(cb: () => void) {
 const ZEROS = { days: 0, hours: 0, minutes: 0, seconds: 0 };
 
 function useCountdown(target: Date) {
-  // useSyncExternalStore: React's built-in API for external subscriptions.
-  // No setState in any effect — eliminates the react-compiler lint warning.
-  // getServerSnapshot returns zeros → SSR HTML matches initial client render.
+  // Cache the last snapshot so getSnapshot returns a stable reference when
+  // values haven't changed. useSyncExternalStore uses Object.is to compare
+  // snapshots — returning a new object every call causes error #185 (infinite loop).
+  const cache = useRef(ZEROS);
+
   return useSyncExternalStore(
     subscribeToTick,
     () => {
       const diff = target.getTime() - Date.now();
-      if (diff <= 0) return ZEROS;
-      return {
-        days: Math.floor(diff / 86400000),
-        hours: Math.floor((diff % 86400000) / 3600000),
-        minutes: Math.floor((diff % 3600000) / 60000),
-        seconds: Math.floor((diff % 60000) / 1000),
-      };
+      if (diff <= 0) {
+        if (cache.current !== ZEROS) cache.current = ZEROS;
+        return cache.current;
+      }
+      const days    = Math.floor(diff / 86400000);
+      const hours   = Math.floor((diff % 86400000) / 3600000);
+      const minutes = Math.floor((diff % 3600000) / 60000);
+      const seconds = Math.floor((diff % 60000) / 1000);
+      const prev = cache.current;
+      // Only allocate a new object when values actually changed
+      if (prev.days !== days || prev.hours !== hours || prev.minutes !== minutes || prev.seconds !== seconds) {
+        cache.current = { days, hours, minutes, seconds };
+      }
+      return cache.current;
     },
     () => ZEROS,
   );
