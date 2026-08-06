@@ -8,7 +8,7 @@ import AshokaCss from "@/components/AshokaCss";
 
 /* ─── data ─── */
 const schedule = [
-  { date: "09 Aug 2026", day: "Sunday", time: "05:30 AM – 06:30 AM", domain: "Marathon", competition: "Run for the Nation – 2K Independence Day Marathon", venue: "Off Campus", icon: "🏃", color: "#FF9933", id: "marathon" },
+  { date: "09 Aug 2026", day: "Sunday", time: "05:30 AM – 06:30 AM", domain: "Marathon", competition: "Run for the Nation – 2K Independence Day Marathon", venue: "OAT (Open Air Theatre)", icon: "🏃", color: "#FF9933", id: "marathon" },
   { date: "10 Aug 2026", day: "Monday", time: "03:20 PM – 05:20 PM", domain: "Arts Club", competition: "Nation Builders Art Competition", venue: "Student Activity Centre (SAC Hall)", icon: "🎨", color: "#138808", id: "art" },
   { date: "10 Aug 2026", day: "Monday", time: "03:20 PM – 05:20 PM", domain: "Literature Club", competition: "Voice of Freedom – Essay Writing & Elocution Competition", venue: "Rose Hall & Jasmine Hall", icon: "✍️", color: "#138808", id: "literature" },
   { date: "11 Aug 2026", day: "Tuesday", time: "10:00 AM – 12:20 PM", domain: "Photography Club", competition: "Frames of Freedom – Patriotic Photography Outreach Competition", venue: "Off Campus", icon: "📷", color: "#FFB347", id: "photography" },
