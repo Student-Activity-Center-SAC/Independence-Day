@@ -50,7 +50,7 @@ export async function GET(req: NextRequest) {
 
       // Recent 50 registrations
       sql`
-        SELECT id, name, email, phone, roll_number, department, year, competition,
+        SELECT id, name, email, phone, roll_number, department, year, competition, time_slot,
                to_char(created_at AT TIME ZONE 'Asia/Kolkata', 'DD Mon YYYY HH12:MI AM') AS registered_at
         FROM registrations
         ORDER BY created_at DESC

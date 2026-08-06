@@ -16,12 +16,14 @@ export async function ensureTable() {
       competition   TEXT NOT NULL,
       gender        TEXT,
       accommodation TEXT,
+      time_slot     TEXT,
       created_at    TIMESTAMPTZ DEFAULT NOW()
     )
   `;
   // Add columns that may be missing on existing tables
   await sql`ALTER TABLE registrations ADD COLUMN IF NOT EXISTS gender TEXT`;
   await sql`ALTER TABLE registrations ADD COLUMN IF NOT EXISTS accommodation TEXT`;
+  await sql`ALTER TABLE registrations ADD COLUMN IF NOT EXISTS time_slot TEXT`;
 }
 
 export async function ensureUsersTable() {

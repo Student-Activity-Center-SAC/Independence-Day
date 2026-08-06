@@ -19,6 +19,7 @@ interface Stats {
     department: string;
     year: string;
     competition: string;
+    time_slot: string | null;
     registered_at: string;
   }[];
   byDate: { day: string; count: number }[];
@@ -218,8 +219,8 @@ export default function AdminPage() {
   };
 
   const exportCSV = () => {
-    const headers = ["ID", "Name", "Email", "Phone", "Roll No", "Department", "Year", "Competition", "Registered At"];
-    const rows = filtered.map((r) => [r.id, r.name, r.email, r.phone, r.roll_number, r.department, r.year, r.competition, r.registered_at]);
+    const headers = ["ID", "Name", "Email", "Phone", "Roll No", "Department", "Year", "Competition", "Time Slot", "Registered At"];
+    const rows = filtered.map((r) => [r.id, r.name, r.email, r.phone, r.roll_number, r.department, r.year, r.competition, r.time_slot ?? "—", r.registered_at]);
     const csv = [headers, ...rows].map((r) => r.map((v) => `"${v}"`).join(",")).join("\n");
     const blob = new Blob([csv], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
@@ -227,8 +228,8 @@ export default function AdminPage() {
   };
 
   const exportXLSX = () => {
-    const headers = ["ID", "Name", "Email", "Phone", "Roll No", "Department", "Year", "Competition", "Registered At"];
-    const rows = filtered.map((r) => [r.id, r.name, r.email, r.phone, r.roll_number, r.department, r.year, r.competition, r.registered_at]);
+    const headers = ["ID", "Name", "Email", "Phone", "Roll No", "Department", "Year", "Competition", "Time Slot", "Registered At"];
+    const rows = filtered.map((r) => [r.id, r.name, r.email, r.phone, r.roll_number, r.department, r.year, r.competition, r.time_slot ?? "—", r.registered_at]);
 
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
@@ -243,6 +244,7 @@ export default function AdminPage() {
       { wch: 16 }, // Department
       { wch: 10 }, // Year
       { wch: 22 }, // Competition
+      { wch: 18 }, // Time Slot
       { wch: 22 }, // Registered At
     ];
 
@@ -411,6 +413,7 @@ export default function AdminPage() {
                   >
                     Competition {sortField === "competition" ? (sortDir === "asc" ? "↑" : "↓") : ""}
                   </th>
+                  <th className="px-5 py-3 text-left font-medium whitespace-nowrap">Time Slot</th>
                   <th
                     className="px-5 py-3 text-left font-medium cursor-pointer hover:text-white transition-colors select-none whitespace-nowrap"
                     onClick={() => toggleSort("registered_at")}
@@ -423,7 +426,7 @@ export default function AdminPage() {
               <tbody>
                 {filtered.length === 0 ? (
                   <tr>
-                    <td colSpan={10} className="px-5 py-16 text-center text-[#8888A8] text-sm">
+                    <td colSpan={11} className="px-5 py-16 text-center text-[#8888A8] text-sm">
                       {stats?.total === 0 ? "No registrations yet 🎉" : "No results match your search"}
                     </td>
                   </tr>
@@ -453,6 +456,15 @@ export default function AdminPage() {
                         >
                           {r.competition}
                         </span>
+                      </td>
+                      <td className="px-5 py-3.5">
+                        {r.time_slot ? (
+                          <span className="px-2.5 py-1 rounded-full text-[10px] font-semibold whitespace-nowrap bg-[#138808]/15 text-[#138808] border border-[#138808]/30">
+                            {r.time_slot}
+                          </span>
+                        ) : (
+                          <span className="text-[#8888A8] text-xs">—</span>
+                        )}
                       </td>
                       <td className="px-5 py-3.5 text-[#8888A8] text-xs whitespace-nowrap">{r.registered_at}</td>
                       <td className="px-5 py-3.5">
