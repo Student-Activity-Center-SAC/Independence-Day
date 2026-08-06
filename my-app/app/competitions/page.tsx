@@ -20,6 +20,8 @@ const schedule = [
   { date: "15 Aug 2026", day: "Saturday", time: "During Independence Day Celebrations", domain: "—", competition: "Prize Distribution & Felicitation Ceremony", venue: "Open Air Theatre (OAT)", icon: "🏆", color: "#FFD700", id: "prize" },
 ];
 
+const EVENT_SLOTS = ["11:00 AM – 1:00 PM", "3:30 PM – 5:30 PM"];
+
 const benefits = [
   "Automatically generated E-Certificate through the registration portal after successful verification.",
   "Winners and outstanding performers receive Awards, Certificates & Special Recognition.",
@@ -122,7 +124,15 @@ export default function CompetitionsPage() {
                             <span className="text-xs font-bold px-2.5 py-0.5 rounded-full" style={{ background: `${ev.color}22`, color: ev.color }}>
                               {ev.domain}
                             </span>
-                            <span className="text-xs text-[#8888A8]">{ev.time}</span>
+                            {ev.id === "marathon" ? (
+                              <span className="text-xs text-[#8888A8]">{ev.time}</span>
+                            ) : (
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                {EVENT_SLOTS.map((s, i) => (
+                                  <span key={i} className="text-[10px] px-2 py-0.5 rounded-full bg-white/6 border border-white/10 text-[#A0A0B8] font-medium">⏰ {s}</span>
+                                ))}
+                              </div>
+                            )}
                           </div>
                           <h3 className="text-white font-bold text-base leading-snug">{ev.competition}</h3>
                           <p className="text-[#8888A8] text-xs mt-1 flex items-center gap-1">
@@ -154,7 +164,19 @@ export default function CompetitionsPage() {
                                 <div>
                                   <p className="text-[10px] text-[#8888A8] uppercase tracking-wider mb-1">Date & Time</p>
                                   <p className="text-white font-medium">{date}</p>
-                                  <p className="text-[#8888A8]">{ev.time}</p>
+                                  {ev.id === "marathon" ? (
+                                    <p className="text-[#8888A8] text-sm">{ev.time}</p>
+                                  ) : (
+                                    <div className="space-y-1 mt-1">
+                                      {EVENT_SLOTS.map((s, i) => (
+                                        <p key={i} className="text-[#8888A8] text-xs flex items-center gap-1">
+                                          <span className="text-[#FF9933] font-bold text-[9px] uppercase">Slot {i + 1}</span>
+                                          <span>{s}</span>
+                                        </p>
+                                      ))}
+                                      <p className="text-[10px] text-[#138808] mt-1">Register for either slot</p>
+                                    </div>
+                                  )}
                                 </div>
                                 <div>
                                   <p className="text-[10px] text-[#8888A8] uppercase tracking-wider mb-1">Venue</p>

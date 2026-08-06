@@ -277,7 +277,7 @@ export default function ProfilePage() {
                 type="text"
                 inputMode="numeric"
                 placeholder="e.g. 2400030188"
-                value={form.idNumber}
+                value={idFromEmail ? (extractedId ?? form.idNumber) : form.idNumber}
                 readOnly={idFromEmail}
                 onChange={(e) => !idFromEmail && set("idNumber", e.target.value.replace(/\D/g, "").slice(0, 11))}
                 className={`w-full bg-[#0D0D1A] border rounded-xl px-4 py-3 text-sm focus:outline-none transition-colors ${
