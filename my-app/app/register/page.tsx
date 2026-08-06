@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState, useEffect } from "react";
+import { Suspense, useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
@@ -33,6 +33,308 @@ const departments = [
 ];
 
 const years = ["1st Year", "2nd Year", "3rd Year", "4th Year", "PG – 1st Year", "PG – 2nd Year"];
+
+interface Country { code: string; flag: string; name: string; }
+
+const COUNTRIES: Country[] = [
+  { code: "+93", flag: "🇦🇫", name: "Afghanistan" },
+  { code: "+355", flag: "🇦🇱", name: "Albania" },
+  { code: "+213", flag: "🇩🇿", name: "Algeria" },
+  { code: "+376", flag: "🇦🇩", name: "Andorra" },
+  { code: "+244", flag: "🇦🇴", name: "Angola" },
+  { code: "+1268", flag: "🇦🇬", name: "Antigua and Barbuda" },
+  { code: "+54", flag: "🇦🇷", name: "Argentina" },
+  { code: "+374", flag: "🇦🇲", name: "Armenia" },
+  { code: "+61", flag: "🇦🇺", name: "Australia" },
+  { code: "+43", flag: "🇦🇹", name: "Austria" },
+  { code: "+994", flag: "🇦🇿", name: "Azerbaijan" },
+  { code: "+1242", flag: "🇧🇸", name: "Bahamas" },
+  { code: "+973", flag: "🇧🇭", name: "Bahrain" },
+  { code: "+880", flag: "🇧🇩", name: "Bangladesh" },
+  { code: "+1246", flag: "🇧🇧", name: "Barbados" },
+  { code: "+375", flag: "🇧🇾", name: "Belarus" },
+  { code: "+32", flag: "🇧🇪", name: "Belgium" },
+  { code: "+501", flag: "🇧🇿", name: "Belize" },
+  { code: "+229", flag: "🇧🇯", name: "Benin" },
+  { code: "+975", flag: "🇧🇹", name: "Bhutan" },
+  { code: "+591", flag: "🇧🇴", name: "Bolivia" },
+  { code: "+387", flag: "🇧🇦", name: "Bosnia and Herzegovina" },
+  { code: "+267", flag: "🇧🇼", name: "Botswana" },
+  { code: "+55", flag: "🇧🇷", name: "Brazil" },
+  { code: "+673", flag: "🇧🇳", name: "Brunei" },
+  { code: "+359", flag: "🇧🇬", name: "Bulgaria" },
+  { code: "+226", flag: "🇧🇫", name: "Burkina Faso" },
+  { code: "+257", flag: "🇧🇮", name: "Burundi" },
+  { code: "+855", flag: "🇰🇭", name: "Cambodia" },
+  { code: "+237", flag: "🇨🇲", name: "Cameroon" },
+  { code: "+1", flag: "🇨🇦", name: "Canada" },
+  { code: "+238", flag: "🇨🇻", name: "Cape Verde" },
+  { code: "+236", flag: "🇨🇫", name: "Central African Republic" },
+  { code: "+235", flag: "🇹🇩", name: "Chad" },
+  { code: "+56", flag: "🇨🇱", name: "Chile" },
+  { code: "+86", flag: "🇨🇳", name: "China" },
+  { code: "+57", flag: "🇨🇴", name: "Colombia" },
+  { code: "+269", flag: "🇰🇲", name: "Comoros" },
+  { code: "+242", flag: "🇨🇬", name: "Congo" },
+  { code: "+243", flag: "🇨🇩", name: "DR Congo" },
+  { code: "+506", flag: "🇨🇷", name: "Costa Rica" },
+  { code: "+225", flag: "🇨🇮", name: "Côte d'Ivoire" },
+  { code: "+385", flag: "🇭🇷", name: "Croatia" },
+  { code: "+53", flag: "🇨🇺", name: "Cuba" },
+  { code: "+357", flag: "🇨🇾", name: "Cyprus" },
+  { code: "+420", flag: "🇨🇿", name: "Czech Republic" },
+  { code: "+45", flag: "🇩🇰", name: "Denmark" },
+  { code: "+253", flag: "🇩🇯", name: "Djibouti" },
+  { code: "+1767", flag: "🇩🇲", name: "Dominica" },
+  { code: "+1809", flag: "🇩🇴", name: "Dominican Republic" },
+  { code: "+593", flag: "🇪🇨", name: "Ecuador" },
+  { code: "+20", flag: "🇪🇬", name: "Egypt" },
+  { code: "+503", flag: "🇸🇻", name: "El Salvador" },
+  { code: "+240", flag: "🇬🇶", name: "Equatorial Guinea" },
+  { code: "+291", flag: "🇪🇷", name: "Eritrea" },
+  { code: "+372", flag: "🇪🇪", name: "Estonia" },
+  { code: "+268", flag: "🇸🇿", name: "Eswatini" },
+  { code: "+251", flag: "🇪🇹", name: "Ethiopia" },
+  { code: "+679", flag: "🇫🇯", name: "Fiji" },
+  { code: "+358", flag: "🇫🇮", name: "Finland" },
+  { code: "+33", flag: "🇫🇷", name: "France" },
+  { code: "+241", flag: "🇬🇦", name: "Gabon" },
+  { code: "+220", flag: "🇬🇲", name: "Gambia" },
+  { code: "+995", flag: "🇬🇪", name: "Georgia" },
+  { code: "+49", flag: "🇩🇪", name: "Germany" },
+  { code: "+233", flag: "🇬🇭", name: "Ghana" },
+  { code: "+30", flag: "🇬🇷", name: "Greece" },
+  { code: "+1473", flag: "🇬🇩", name: "Grenada" },
+  { code: "+502", flag: "🇬🇹", name: "Guatemala" },
+  { code: "+224", flag: "🇬🇳", name: "Guinea" },
+  { code: "+245", flag: "🇬🇼", name: "Guinea-Bissau" },
+  { code: "+592", flag: "🇬🇾", name: "Guyana" },
+  { code: "+509", flag: "🇭🇹", name: "Haiti" },
+  { code: "+504", flag: "🇭🇳", name: "Honduras" },
+  { code: "+36", flag: "🇭🇺", name: "Hungary" },
+  { code: "+354", flag: "🇮🇸", name: "Iceland" },
+  { code: "+91", flag: "🇮🇳", name: "India" },
+  { code: "+62", flag: "🇮🇩", name: "Indonesia" },
+  { code: "+98", flag: "🇮🇷", name: "Iran" },
+  { code: "+964", flag: "🇮🇶", name: "Iraq" },
+  { code: "+353", flag: "🇮🇪", name: "Ireland" },
+  { code: "+972", flag: "🇮🇱", name: "Israel" },
+  { code: "+39", flag: "🇮🇹", name: "Italy" },
+  { code: "+1876", flag: "🇯🇲", name: "Jamaica" },
+  { code: "+81", flag: "🇯🇵", name: "Japan" },
+  { code: "+962", flag: "🇯🇴", name: "Jordan" },
+  { code: "+7", flag: "🇰🇿", name: "Kazakhstan" },
+  { code: "+254", flag: "🇰🇪", name: "Kenya" },
+  { code: "+686", flag: "🇰🇮", name: "Kiribati" },
+  { code: "+965", flag: "🇰🇼", name: "Kuwait" },
+  { code: "+996", flag: "🇰🇬", name: "Kyrgyzstan" },
+  { code: "+856", flag: "🇱🇦", name: "Laos" },
+  { code: "+371", flag: "🇱🇻", name: "Latvia" },
+  { code: "+961", flag: "🇱🇧", name: "Lebanon" },
+  { code: "+266", flag: "🇱🇸", name: "Lesotho" },
+  { code: "+231", flag: "🇱🇷", name: "Liberia" },
+  { code: "+218", flag: "🇱🇾", name: "Libya" },
+  { code: "+423", flag: "🇱🇮", name: "Liechtenstein" },
+  { code: "+370", flag: "🇱🇹", name: "Lithuania" },
+  { code: "+352", flag: "🇱🇺", name: "Luxembourg" },
+  { code: "+261", flag: "🇲🇬", name: "Madagascar" },
+  { code: "+265", flag: "🇲🇼", name: "Malawi" },
+  { code: "+60", flag: "🇲🇾", name: "Malaysia" },
+  { code: "+960", flag: "🇲🇻", name: "Maldives" },
+  { code: "+223", flag: "🇲🇱", name: "Mali" },
+  { code: "+356", flag: "🇲🇹", name: "Malta" },
+  { code: "+692", flag: "🇲🇭", name: "Marshall Islands" },
+  { code: "+222", flag: "🇲🇷", name: "Mauritania" },
+  { code: "+230", flag: "🇲🇺", name: "Mauritius" },
+  { code: "+52", flag: "🇲🇽", name: "Mexico" },
+  { code: "+691", flag: "🇫🇲", name: "Micronesia" },
+  { code: "+373", flag: "🇲🇩", name: "Moldova" },
+  { code: "+377", flag: "🇲🇨", name: "Monaco" },
+  { code: "+976", flag: "🇲🇳", name: "Mongolia" },
+  { code: "+382", flag: "🇲🇪", name: "Montenegro" },
+  { code: "+212", flag: "🇲🇦", name: "Morocco" },
+  { code: "+258", flag: "🇲🇿", name: "Mozambique" },
+  { code: "+95", flag: "🇲🇲", name: "Myanmar" },
+  { code: "+264", flag: "🇳🇦", name: "Namibia" },
+  { code: "+674", flag: "🇳🇷", name: "Nauru" },
+  { code: "+977", flag: "🇳🇵", name: "Nepal" },
+  { code: "+31", flag: "🇳🇱", name: "Netherlands" },
+  { code: "+64", flag: "🇳🇿", name: "New Zealand" },
+  { code: "+505", flag: "🇳🇮", name: "Nicaragua" },
+  { code: "+227", flag: "🇳🇪", name: "Niger" },
+  { code: "+234", flag: "🇳🇬", name: "Nigeria" },
+  { code: "+850", flag: "🇰🇵", name: "North Korea" },
+  { code: "+389", flag: "🇲🇰", name: "North Macedonia" },
+  { code: "+47", flag: "🇳🇴", name: "Norway" },
+  { code: "+968", flag: "🇴🇲", name: "Oman" },
+  { code: "+92", flag: "🇵🇰", name: "Pakistan" },
+  { code: "+680", flag: "🇵🇼", name: "Palau" },
+  { code: "+970", flag: "🇵🇸", name: "Palestine" },
+  { code: "+507", flag: "🇵🇦", name: "Panama" },
+  { code: "+675", flag: "🇵🇬", name: "Papua New Guinea" },
+  { code: "+595", flag: "🇵🇾", name: "Paraguay" },
+  { code: "+51", flag: "🇵🇪", name: "Peru" },
+  { code: "+63", flag: "🇵🇭", name: "Philippines" },
+  { code: "+48", flag: "🇵🇱", name: "Poland" },
+  { code: "+351", flag: "🇵🇹", name: "Portugal" },
+  { code: "+974", flag: "🇶🇦", name: "Qatar" },
+  { code: "+40", flag: "🇷🇴", name: "Romania" },
+  { code: "+7", flag: "🇷🇺", name: "Russia" },
+  { code: "+250", flag: "🇷🇼", name: "Rwanda" },
+  { code: "+1869", flag: "🇰🇳", name: "Saint Kitts and Nevis" },
+  { code: "+1758", flag: "🇱🇨", name: "Saint Lucia" },
+  { code: "+1784", flag: "🇻🇨", name: "Saint Vincent" },
+  { code: "+685", flag: "🇼🇸", name: "Samoa" },
+  { code: "+378", flag: "🇸🇲", name: "San Marino" },
+  { code: "+239", flag: "🇸🇹", name: "São Tomé and Príncipe" },
+  { code: "+966", flag: "🇸🇦", name: "Saudi Arabia" },
+  { code: "+221", flag: "🇸🇳", name: "Senegal" },
+  { code: "+381", flag: "🇷🇸", name: "Serbia" },
+  { code: "+248", flag: "🇸🇨", name: "Seychelles" },
+  { code: "+232", flag: "🇸🇱", name: "Sierra Leone" },
+  { code: "+65", flag: "🇸🇬", name: "Singapore" },
+  { code: "+421", flag: "🇸🇰", name: "Slovakia" },
+  { code: "+386", flag: "🇸🇮", name: "Slovenia" },
+  { code: "+677", flag: "🇸🇧", name: "Solomon Islands" },
+  { code: "+252", flag: "🇸🇴", name: "Somalia" },
+  { code: "+27", flag: "🇿🇦", name: "South Africa" },
+  { code: "+82", flag: "🇰🇷", name: "South Korea" },
+  { code: "+211", flag: "🇸🇸", name: "South Sudan" },
+  { code: "+34", flag: "🇪🇸", name: "Spain" },
+  { code: "+94", flag: "🇱🇰", name: "Sri Lanka" },
+  { code: "+249", flag: "🇸🇩", name: "Sudan" },
+  { code: "+597", flag: "🇸🇷", name: "Suriname" },
+  { code: "+46", flag: "🇸🇪", name: "Sweden" },
+  { code: "+41", flag: "🇨🇭", name: "Switzerland" },
+  { code: "+963", flag: "🇸🇾", name: "Syria" },
+  { code: "+886", flag: "🇹🇼", name: "Taiwan" },
+  { code: "+992", flag: "🇹🇯", name: "Tajikistan" },
+  { code: "+255", flag: "🇹🇿", name: "Tanzania" },
+  { code: "+66", flag: "🇹🇭", name: "Thailand" },
+  { code: "+670", flag: "🇹🇱", name: "Timor-Leste" },
+  { code: "+228", flag: "🇹🇬", name: "Togo" },
+  { code: "+676", flag: "🇹🇴", name: "Tonga" },
+  { code: "+1868", flag: "🇹🇹", name: "Trinidad and Tobago" },
+  { code: "+216", flag: "🇹🇳", name: "Tunisia" },
+  { code: "+90", flag: "🇹🇷", name: "Turkey" },
+  { code: "+993", flag: "🇹🇲", name: "Turkmenistan" },
+  { code: "+688", flag: "🇹🇻", name: "Tuvalu" },
+  { code: "+256", flag: "🇺🇬", name: "Uganda" },
+  { code: "+380", flag: "🇺🇦", name: "Ukraine" },
+  { code: "+971", flag: "🇦🇪", name: "United Arab Emirates" },
+  { code: "+44", flag: "🇬🇧", name: "United Kingdom" },
+  { code: "+1", flag: "🇺🇸", name: "United States" },
+  { code: "+598", flag: "🇺🇾", name: "Uruguay" },
+  { code: "+998", flag: "🇺🇿", name: "Uzbekistan" },
+  { code: "+678", flag: "🇻🇺", name: "Vanuatu" },
+  { code: "+379", flag: "🇻🇦", name: "Vatican" },
+  { code: "+58", flag: "🇻🇪", name: "Venezuela" },
+  { code: "+84", flag: "🇻🇳", name: "Vietnam" },
+  { code: "+967", flag: "🇾🇪", name: "Yemen" },
+  { code: "+260", flag: "🇿🇲", name: "Zambia" },
+  { code: "+263", flag: "🇿🇼", name: "Zimbabwe" },
+];
+
+function CountryPicker({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (code: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const ref = useRef<HTMLDivElement>(null);
+  const searchRef = useRef<HTMLInputElement>(null);
+
+  const selected = COUNTRIES.find((c) => c.code === value) ?? { flag: "🌐", code: value, name: "" };
+
+  const filtered = COUNTRIES.filter(
+    (c) =>
+      c.name.toLowerCase().includes(search.toLowerCase()) ||
+      c.code.includes(search)
+  );
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
+  useEffect(() => {
+    if (open) setTimeout(() => searchRef.current?.focus(), 50);
+  }, [open]);
+
+  return (
+    <div ref={ref} className="relative shrink-0">
+      <button
+        type="button"
+        onClick={() => { setOpen(!open); setSearch(""); }}
+        className="flex items-center gap-1.5 h-[46px] px-3 bg-[#07070E] border border-white/12 rounded-xl text-white text-sm focus:outline-none hover:border-white/25 transition-colors min-w-[90px]"
+      >
+        <span className="text-base leading-none">{selected.flag}</span>
+        <span className="font-medium">{selected.code}</span>
+        <svg className="ml-auto opacity-40" width="10" height="6" viewBox="0 0 10 6" fill="none">
+          <path d="M1 1l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      </button>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: -6, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -4, scale: 0.97 }}
+            transition={{ duration: 0.15 }}
+            className="absolute z-50 top-full mt-1.5 left-0 w-64 bg-[#0F0F1A] border border-white/10 rounded-xl shadow-2xl overflow-hidden"
+          >
+            <div className="p-2 border-b border-white/8">
+              <div className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-[#07070E] border border-white/10">
+                <svg width="13" height="13" viewBox="0 0 20 20" fill="none" className="opacity-40 shrink-0">
+                  <circle cx="9" cy="9" r="6" stroke="currentColor" strokeWidth="2"/>
+                  <path d="M15 15l3 3" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                </svg>
+                <input
+                  ref={searchRef}
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search country or code…"
+                  className="flex-1 bg-transparent text-white text-xs placeholder:text-[#8888A8]/60 focus:outline-none"
+                />
+                {search && (
+                  <button onClick={() => setSearch("")} className="text-[#8888A8] hover:text-white text-xs">×</button>
+                )}
+              </div>
+            </div>
+            <div className="max-h-52 overflow-y-auto">
+              {filtered.length === 0 ? (
+                <p className="text-[#8888A8] text-xs text-center py-4">No results</p>
+              ) : (
+                filtered.map((c) => (
+                  <button
+                    key={`${c.code}-${c.name}`}
+                    type="button"
+                    onClick={() => { onChange(c.code); setOpen(false); setSearch(""); }}
+                    className={`w-full flex items-center gap-2.5 px-3 py-2.5 text-left hover:bg-white/5 transition-colors ${
+                      c.code === value && c.name === selected.name ? "bg-[#FF9933]/8" : ""
+                    }`}
+                  >
+                    <span className="text-base shrink-0">{c.flag}</span>
+                    <span className="text-white text-xs flex-1 truncate">{c.name}</span>
+                    <span className="text-[#8888A8] text-xs shrink-0">{c.code}</span>
+                  </button>
+                ))
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
 
 type Step = 1 | 2 | 3 | 4;
 
@@ -119,10 +421,7 @@ function FastTrackRegister({
           competition,
         }),
       });
-      if (!res.ok) {
-        const d = await res.json();
-        throw new Error(d.error ?? "Registration failed");
-      }
+      if (!res.ok) { const d = await res.json(); throw new Error(d.error ?? "Registration failed"); }
       setSubmitted(true);
     } catch (e) {
       setSubmitError(e instanceof Error ? e.message : "Something went wrong");
@@ -135,47 +434,24 @@ function FastTrackRegister({
     return (
       <div className="min-h-screen flex items-center justify-center px-6 pt-24 pb-12 bg-[#07070E]">
         <motion.div
-          initial={{ scale: 0.85, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
+          initial={{ scale: 0.85, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
           transition={{ ease: [0.22, 1, 0.36, 1], duration: 0.7 }}
           className="max-w-md w-full text-center"
         >
-          <div className="mb-8 flex justify-center chakra-spin">
-            <AshokaCss size={80} />
-          </div>
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.4, type: "spring", stiffness: 200 }}
-            className="text-6xl mb-6"
-          >
-            🎉
-          </motion.div>
-          <h2 className="font-[family-name:var(--font-cinzel)] text-2xl sm:text-3xl font-black text-white mb-3">
-            Registration Successful!
-          </h2>
+          <div className="mb-8 flex justify-center chakra-spin"><AshokaCss size={80} /></div>
+          <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.4, type: "spring", stiffness: 200 }} className="text-6xl mb-6">🎉</motion.div>
+          <h2 className="font-[family-name:var(--font-cinzel)] text-2xl sm:text-3xl font-black text-white mb-3">Registration Successful!</h2>
           <div className="tricolor-line w-20 mx-auto my-4 rounded-full" />
-          <p className="text-[#8888A8] mb-2">
-            You&apos;re all set, <strong className="text-white">{session?.user?.name?.split(" ")[0]}</strong>!
-          </p>
-          <p className="text-[#8888A8] text-sm mb-8">
-            Successfully registered for{" "}
-            <strong className="text-[#FF9933]">{competition}</strong>.
-          </p>
+          <p className="text-[#8888A8] mb-2">You&apos;re all set, <strong className="text-white">{session?.user?.name?.split(" ")[0]}</strong>!</p>
+          <p className="text-[#8888A8] text-sm mb-8">Successfully registered for <strong className="text-[#FF9933]">{competition}</strong>.</p>
           <p className="text-[#8888A8] text-xs leading-relaxed mb-8 px-4 py-3 rounded-xl bg-[#0F0F1A] border border-[#138808]/20">
             Your E-Certificate will be automatically generated after successful verification of participation.
           </p>
           <div className="flex flex-col sm:flex-row items-center gap-3 justify-center">
-            <button
-              onClick={() => { setSubmitted(false); setCompetition(""); setAgreed(false); }}
-              className="px-8 py-3 rounded-full border border-[#FF9933]/40 text-[#FF9933] text-sm font-semibold hover:bg-[#FF9933]/10 transition-colors"
-            >
+            <button onClick={() => { setSubmitted(false); setCompetition(""); setAgreed(false); }} className="px-8 py-3 rounded-full border border-[#FF9933]/40 text-[#FF9933] text-sm font-semibold hover:bg-[#FF9933]/10 transition-colors">
               Register for another event
             </button>
-            <Link
-              href="/my-activities"
-              className="px-8 py-3 rounded-full bg-gradient-to-r from-[#138808] to-[#0d6b06] text-white text-sm font-semibold hover:shadow-[0_0_18px_rgba(19,136,8,0.35)] transition-all"
-            >
+            <Link href="/my-activities" className="px-8 py-3 rounded-full bg-gradient-to-r from-[#138808] to-[#0d6b06] text-white text-sm font-semibold hover:shadow-[0_0_18px_rgba(19,136,8,0.35)] transition-all">
               View My Activities →
             </Link>
           </div>
@@ -187,7 +463,6 @@ function FastTrackRegister({
   return (
     <div className="min-h-screen pt-24 pb-16 px-4 bg-[#07070E]">
       <div className="max-w-xl mx-auto">
-        {/* Header */}
         <div className="text-center mb-10">
           <div className="mb-6 flex justify-center">
             <div className="float-anim drop-shadow-[0_8px_30px_rgba(255,153,51,0.3)]">
@@ -201,12 +476,9 @@ function FastTrackRegister({
             </div>
           </div>
           <p className="text-[10px] tracking-[0.3em] text-[#FF9933] uppercase font-semibold mb-2">80th Independence Day</p>
-          <h1 className="font-[family-name:var(--font-cinzel)] text-2xl sm:text-4xl font-black text-white">
-            Competition Registration
-          </h1>
+          <h1 className="font-[family-name:var(--font-cinzel)] text-2xl sm:text-4xl font-black text-white">Competition Registration</h1>
         </div>
 
-        {/* Profile identity pill */}
         <div className="mb-6 px-4 py-3 rounded-xl bg-[#138808]/8 border border-[#138808]/20 flex items-center gap-3">
           <div className="w-8 h-8 rounded-full bg-[#138808]/20 border border-[#138808]/40 flex items-center justify-center text-[#138808] font-bold text-sm shrink-0">
             {session?.user?.name?.[0]?.toUpperCase()}
@@ -218,7 +490,6 @@ function FastTrackRegister({
           <Link href="/my-activities" className="shrink-0 text-[10px] text-[#138808] hover:underline">My Activities</Link>
         </div>
 
-        {/* Competition selector */}
         <div className="card-glass rounded-2xl p-5 sm:p-6 mb-5">
           <h2 className="font-[family-name:var(--font-cinzel)] text-base font-bold text-white mb-4">
             {competition ? "Registering For" : "Choose Your Competition"}
@@ -227,21 +498,12 @@ function FastTrackRegister({
             <div className="flex items-start gap-3 px-4 py-3.5 rounded-xl bg-[#FF9933]/8 border border-[#FF9933]/30">
               <span className="text-[#FF9933] text-lg mt-0.5">●</span>
               <p className="text-white text-sm font-medium leading-snug">{competition}</p>
-              <button
-                onClick={() => setCompetition("")}
-                className="ml-auto shrink-0 text-[10px] text-[#8888A8] hover:text-white transition-colors"
-              >
-                Change
-              </button>
+              <button onClick={() => setCompetition("")} className="ml-auto shrink-0 text-[10px] text-[#8888A8] hover:text-white transition-colors">Change</button>
             </div>
           ) : (
             <div className="space-y-2">
               {competitions.map((c) => (
-                <button
-                  key={c}
-                  onClick={() => setCompetition(c)}
-                  className="w-full text-left px-4 py-3.5 rounded-xl border border-white/8 bg-[#07070E] text-[#8888A8] text-sm hover:border-[#FF9933]/40 hover:text-white transition-all duration-200"
-                >
+                <button key={c} onClick={() => setCompetition(c)} className="w-full text-left px-4 py-3.5 rounded-xl border border-white/8 bg-[#07070E] text-[#8888A8] text-sm hover:border-[#FF9933]/40 hover:text-white transition-all duration-200">
                   <span className="mr-2 text-[#8888A8]">○</span>{c}
                 </button>
               ))}
@@ -249,7 +511,6 @@ function FastTrackRegister({
           )}
         </div>
 
-        {/* What you get */}
         <div className="card-glass rounded-2xl p-5 sm:p-6 mb-5">
           <div className="flex items-center gap-2 mb-4">
             <span className="text-xl">🏅</span>
@@ -259,16 +520,13 @@ function FastTrackRegister({
           <div className="space-y-3">
             {benefits.map((b, i) => (
               <div key={i} className="flex gap-3">
-                <div className="w-6 h-6 rounded-full bg-[#138808]/15 border border-[#138808]/30 flex items-center justify-center shrink-0 text-[#138808] text-[10px] font-bold mt-0.5">
-                  {i + 1}
-                </div>
+                <div className="w-6 h-6 rounded-full bg-[#138808]/15 border border-[#138808]/30 flex items-center justify-center shrink-0 text-[#138808] text-[10px] font-bold mt-0.5">{i + 1}</div>
                 <p className="text-[#A0A0B8] text-sm leading-relaxed">{b}</p>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Attendance guidelines */}
         <div className="card-glass rounded-2xl p-5 sm:p-6 mb-6">
           <div className="flex items-center gap-2 mb-4">
             <span className="text-xl">⚠️</span>
@@ -278,39 +536,26 @@ function FastTrackRegister({
           <div className="space-y-3">
             {attendanceRules.map((r, i) => (
               <div key={i} className="flex gap-3">
-                <div className="w-6 h-6 rounded-full bg-[#FF9933]/10 border border-[#FF9933]/20 flex items-center justify-center shrink-0 text-[#FF9933] text-[10px] font-bold mt-0.5">
-                  {i + 1}
-                </div>
+                <div className="w-6 h-6 rounded-full bg-[#FF9933]/10 border border-[#FF9933]/20 flex items-center justify-center shrink-0 text-[#FF9933] text-[10px] font-bold mt-0.5">{i + 1}</div>
                 <p className="text-[#A0A0B8] text-sm leading-relaxed">{r}</p>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Agreement checkbox */}
         <label className="flex items-start gap-3 mb-5 cursor-pointer group">
           <div
             onClick={() => setAgreed(!agreed)}
-            className={`mt-0.5 w-5 h-5 rounded flex items-center justify-center shrink-0 border transition-all duration-200 ${
-              agreed ? "bg-[#138808] border-[#138808]" : "border-white/20 bg-[#07070E] group-hover:border-white/40"
-            }`}
+            className={`mt-0.5 w-5 h-5 rounded flex items-center justify-center shrink-0 border transition-all duration-200 ${agreed ? "bg-[#138808] border-[#138808]" : "border-white/20 bg-[#07070E] group-hover:border-white/40"}`}
           >
-            {agreed && (
-              <svg width="11" height="9" viewBox="0 0 11 9" fill="none">
-                <path d="M1 4L4 7L10 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            )}
+            {agreed && <svg width="11" height="9" viewBox="0 0 11 9" fill="none"><path d="M1 4L4 7L10 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
           </div>
           <p className="text-[#A0A0B8] text-sm leading-relaxed">
             I have read the attendance guidelines and confirm that I am committed to participating in the selected competition.
           </p>
         </label>
 
-        {submitError && (
-          <div className="mb-4 px-4 py-3 rounded-xl bg-red-900/20 border border-red-500/30 text-sm text-red-400">
-            {submitError}
-          </div>
-        )}
+        {submitError && <div className="mb-4 px-4 py-3 rounded-xl bg-red-900/20 border border-red-500/30 text-sm text-red-400">{submitError}</div>}
 
         <button
           onClick={confirm}
@@ -349,15 +594,17 @@ function MultiStepRegister({ preComp, session, authStatus }: {
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((f) => ({ ...f, phone: e.target.value.replace(/\D/g, "").slice(0, 10) }));
 
-  const handleCountryCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let v = e.target.value.replace(/[^\d+]/g, "");
-    if (v && !v.startsWith("+")) v = "+" + v;
-    setForm((f) => ({ ...f, countryCode: v }));
-  };
-
+  // ID → auto-fills email
   const handleIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value.replace(/\D/g, "").slice(0, 11);
     setForm((f) => ({ ...f, idNumber: val, email: val ? `${val}@kluniversity.in` : "" }));
+  };
+
+  // KLU email → auto-fills ID
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    const match = val.match(/^(\d{10,11})@kluniversity\.in$/i);
+    setForm((f) => ({ ...f, email: val, ...(match ? { idNumber: match[1] } : {}) }));
   };
 
   const handleDeptChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -497,29 +744,57 @@ function MultiStepRegister({ preComp, session, authStatus }: {
                 <h2 className="font-[family-name:var(--font-cinzel)] text-xl font-bold text-white mb-1">Personal Information</h2>
                 <p className="text-[10px] text-[#8888A8]/60 mb-6 tracking-wide">All fields marked <span className="text-[#FF9933]">*</span> are mandatory</p>
                 <div className="space-y-4">
+                  {/* Full Name */}
                   <div>
                     <label className="block text-xs text-[#8888A8] mb-1.5 tracking-wide uppercase font-semibold">Full Name <span className="text-[#FF9933]">*</span></label>
                     <input type="text" value={form.name} onChange={handleNameChange} onBlur={touch("name")} placeholder="Enter your full name" className={inputCls(!!(touched.name && errs.name))} />
                     {touched.name && errs.name && <p className="mt-1 text-xs text-red-400">{errs.name}</p>}
                   </div>
-                  <div>
-                    <label className="block text-xs text-[#8888A8] mb-1.5 tracking-wide uppercase font-semibold">ID Number <span className="text-[#FF9933]">*</span></label>
-                    <input type="text" value={form.idNumber} onChange={handleIdChange} onBlur={touch("idNumber")} placeholder="e.g. 2400030188" maxLength={11} className={inputCls(!!(touched.idNumber && errs.idNumber))} />
-                    {touched.idNumber && errs.idNumber && <p className="mt-1 text-xs text-red-400">{errs.idNumber}</p>}
-                  </div>
+
+                  {/* Email */}
                   <div>
                     <label className="block text-xs text-[#8888A8] mb-1.5 tracking-wide uppercase font-semibold">Email Address <span className="text-[#FF9933]">*</span></label>
-                    <input type="email" value={form.email} onChange={set("email")} onBlur={touch("email")} placeholder="Auto-filled from ID Number" className={inputCls(!!(touched.email && errs.email))} />
+                    <input type="email" value={form.email} onChange={handleEmailChange} onBlur={touch("email")} placeholder="e.g. 2400030188@kluniversity.in" className={inputCls(!!(touched.email && errs.email))} />
                     {touched.email && errs.email && <p className="mt-1 text-xs text-red-400">{errs.email}</p>}
                   </div>
+
+                  {/* ID Number — auto-filled from KLU email */}
+                  <div>
+                    <label className="block text-xs text-[#8888A8] mb-1.5 tracking-wide uppercase font-semibold">ID Number <span className="text-[#FF9933]">*</span></label>
+                    <input
+                      type="text"
+                      value={form.idNumber}
+                      onChange={handleIdChange}
+                      onBlur={touch("idNumber")}
+                      placeholder="Auto-filled from your KLU email"
+                      maxLength={11}
+                      className={inputCls(!!(touched.idNumber && errs.idNumber))}
+                    />
+                    {touched.idNumber && errs.idNumber && <p className="mt-1 text-xs text-red-400">{errs.idNumber}</p>}
+                  </div>
+
+                  {/* Phone */}
                   <div>
                     <label className="block text-xs text-[#8888A8] mb-1.5 tracking-wide uppercase font-semibold">Phone Number <span className="text-[#FF9933]">*</span></label>
                     <div className="flex gap-2">
-                      <input type="text" value={form.countryCode} onChange={handleCountryCodeChange} placeholder="+91" className="w-[72px] shrink-0 bg-[#07070E] border border-white/12 rounded-xl px-3 py-3 text-white text-sm text-center focus:outline-none focus:border-[#FF9933]/60 transition-colors" />
-                      <input type="tel" value={form.phone} onChange={handlePhoneChange} onBlur={touch("phone")} placeholder="XXXXXXXXXX" maxLength={10} className={inputCls(!!(touched.phone && errs.phone))} />
+                      <CountryPicker
+                        value={form.countryCode}
+                        onChange={(code) => setForm((f) => ({ ...f, countryCode: code }))}
+                      />
+                      <input
+                        type="tel"
+                        value={form.phone}
+                        onChange={handlePhoneChange}
+                        onBlur={touch("phone")}
+                        placeholder="Phone number"
+                        maxLength={10}
+                        className={inputCls(!!(touched.phone && errs.phone))}
+                      />
                     </div>
                     {touched.phone && errs.phone && <p className="mt-1 text-xs text-red-400">{errs.phone}</p>}
                   </div>
+
+                  {/* Gender */}
                   <div>
                     <label className="block text-xs text-[#8888A8] mb-2 tracking-wide uppercase font-semibold">Gender <span className="text-[#FF9933]">*</span></label>
                     <div className="flex gap-2">

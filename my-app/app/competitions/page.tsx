@@ -171,7 +171,7 @@ export default function CompetitionsPage() {
                                     Register for this event →
                                   </Link>
                                 ) : (
-                                  <Link href={`/login?from=/register?competition=${encodeURIComponent(ev.competition)}`} className="inline-flex items-center gap-1.5 px-5 py-2 rounded-full border border-[#FF9933]/40 text-[#FF9933] text-xs font-bold hover:bg-[#FF9933]/10 transition-all duration-300">
+                                  <Link href={`/login?from=${encodeURIComponent(`/register?competition=${encodeURIComponent(ev.competition)}`)}`} className="inline-flex items-center gap-1.5 px-5 py-2 rounded-full border border-[#FF9933]/40 text-[#FF9933] text-xs font-bold hover:bg-[#FF9933]/10 transition-all duration-300">
                                     <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="1" width="4.5" height="4.5" fill="#F25022"/><rect x="6.5" y="1" width="4.5" height="4.5" fill="#7FBA00"/><rect x="1" y="6.5" width="4.5" height="4.5" fill="#00A4EF"/><rect x="6.5" y="6.5" width="4.5" height="4.5" fill="#FFB900"/></svg>
                                     Login to Register
                                   </Link>

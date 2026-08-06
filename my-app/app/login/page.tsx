@@ -9,7 +9,7 @@ function LoginContent() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const params = useSearchParams();
-  const from = params.get("from") ?? "/profile";
+  const from = encodeURI(params.get("from") ?? "/profile");
   const [loading, setLoading] = useState(false);
   const error = params.get("error");
 
