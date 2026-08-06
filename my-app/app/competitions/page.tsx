@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
@@ -55,7 +55,19 @@ function FadeIn({ children, delay = 0, className = "" }: { children: React.React
 
 export default function CompetitionsPage() {
   const [expanded, setExpanded] = useState<number | null>(null);
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
+  const [registeredSet, setRegisteredSet] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    if (status !== "authenticated") return;
+    fetch("/api/my-activities")
+      .then((r) => r.json())
+      .then((d) => {
+        const names = (d.registrations ?? []).map((r: { competition: string }) => r.competition);
+        setRegisteredSet(new Set(names));
+      })
+      .catch(() => {});
+  }, [status]);
 
   return (
     <>
@@ -189,9 +201,16 @@ export default function CompetitionsPage() {
                               </div>
                               <div className="mt-4">
                                 {session ? (
-                                  <Link href={`/register?competition=${encodeURIComponent(ev.competition)}`} className="inline-block px-5 py-2 rounded-full bg-gradient-to-r from-[#FF9933] to-[#e68000] text-black text-xs font-bold hover:shadow-[0_0_18px_rgba(255,153,51,0.4)] transition-all duration-300">
-                                    Register for this event →
-                                  </Link>
+                                  registeredSet.has(ev.competition) ? (
+                                    <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-[#138808]/15 border border-[#138808]/40 text-[#138808] text-xs font-bold cursor-default select-none">
+                                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#138808" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                                      Already Registered
+                                    </div>
+                                  ) : (
+                                    <Link href={`/register?competition=${encodeURIComponent(ev.competition)}`} className="inline-block px-5 py-2 rounded-full bg-gradient-to-r from-[#FF9933] to-[#e68000] text-black text-xs font-bold hover:shadow-[0_0_18px_rgba(255,153,51,0.4)] transition-all duration-300">
+                                      Register for this event →
+                                    </Link>
+                                  )
                                 ) : (
                                   <Link href={`/login?from=${encodeURIComponent(`/register?competition=${encodeURIComponent(ev.competition)}`)}`} className="inline-flex items-center gap-1.5 px-5 py-2 rounded-full border border-[#FF9933]/40 text-[#FF9933] text-xs font-bold hover:bg-[#FF9933]/10 transition-all duration-300">
                                     <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="1" width="4.5" height="4.5" fill="#F25022"/><rect x="6.5" y="1" width="4.5" height="4.5" fill="#7FBA00"/><rect x="1" y="6.5" width="4.5" height="4.5" fill="#00A4EF"/><rect x="6.5" y="6.5" width="4.5" height="4.5" fill="#FFB900"/></svg>

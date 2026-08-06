@@ -12,6 +12,13 @@ export async function POST(req: NextRequest) {
 
     await ensureTable();
 
+    const existing = await sql`
+      SELECT id FROM registrations WHERE email = ${email} AND competition = ${competition} LIMIT 1
+    `;
+    if (existing.length > 0) {
+      return NextResponse.json({ error: "You are already registered for this competition." }, { status: 409 });
+    }
+
     await sql`
       INSERT INTO registrations (name, email, phone, roll_number, department, year, competition, gender, accommodation, time_slot)
       VALUES (${name}, ${email}, ${phone}, ${roll_number}, ${department}, ${year}, ${competition}, ${gender ?? null}, ${accommodation ?? null}, ${time_slot ?? null})
