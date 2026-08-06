@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useSyncExternalStore } from "react";
 import { motion, useInView, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import AshokaCss from "@/components/AshokaCss";
@@ -8,24 +8,31 @@ import ParticleCanvas from "@/components/ParticleCanvas";
 import WavingFlag from "@/components/WavingFlag";
 
 /* ─── countdown ─── */
+// Stable subscriber outside the hook — no new reference on every render
+function subscribeToTick(cb: () => void) {
+  const id = setInterval(cb, 1000);
+  return () => clearInterval(id);
+}
+const ZEROS = { days: 0, hours: 0, minutes: 0, seconds: 0 };
+
 function useCountdown(target: Date) {
-  const [cd, setCd] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-  useEffect(() => {
-    function calc() {
+  // useSyncExternalStore: React's built-in API for external subscriptions.
+  // No setState in any effect — eliminates the react-compiler lint warning.
+  // getServerSnapshot returns zeros → SSR HTML matches initial client render.
+  return useSyncExternalStore(
+    subscribeToTick,
+    () => {
       const diff = target.getTime() - Date.now();
-      if (diff <= 0) return { days: 0, hours: 0, minutes: 0, seconds: 0 };
+      if (diff <= 0) return ZEROS;
       return {
         days: Math.floor(diff / 86400000),
         hours: Math.floor((diff % 86400000) / 3600000),
         minutes: Math.floor((diff % 3600000) / 60000),
         seconds: Math.floor((diff % 60000) / 1000),
       };
-    }
-    setCd(calc());
-    const id = setInterval(() => setCd(calc()), 1000);
-    return () => clearInterval(id);
-  }, []); // eslint-disable-line
-  return cd;
+    },
+    () => ZEROS,
+  );
 }
 
 /* ─── data ─── */
