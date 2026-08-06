@@ -68,6 +68,10 @@ export default function MyActivitiesPage() {
   }
 
   const firstName = session?.user?.name?.split(" ")[0] ?? "Student";
+  // deduplicate by competition — keep the latest (API returns DESC order)
+  const uniqueRegs = registrations.filter(
+    (r, i, arr) => arr.findIndex((x) => x.competition === r.competition) === i
+  );
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0A0A15] to-[#07070E] pt-20 pb-16 px-4">
@@ -126,7 +130,7 @@ export default function MyActivitiesPage() {
         <div className="mb-4 flex items-center justify-between">
           <h2 className="font-[family-name:var(--font-cinzel)] text-lg font-bold text-white">
             My Registrations
-            <span className="ml-2 text-sm font-normal text-[#8888A8]">({registrations.length})</span>
+            <span className="ml-2 text-sm font-normal text-[#8888A8]">({uniqueRegs.length})</span>
           </h2>
           <Link
             href="/register"
@@ -136,7 +140,7 @@ export default function MyActivitiesPage() {
           </Link>
         </div>
 
-        {registrations.length === 0 ? (
+        {uniqueRegs.length === 0 ? (
           <div className="card-glass rounded-2xl p-10 text-center">
             <div className="text-4xl mb-4">🏆</div>
             <p className="text-white font-semibold mb-1">No registrations yet</p>
@@ -150,7 +154,7 @@ export default function MyActivitiesPage() {
           </div>
         ) : (
           <div className="space-y-4">
-            {registrations.map((reg) => {
+            {uniqueRegs.map((reg) => {
               const info = schedule[reg.competition];
               return (
                 <div key={reg.id} className="card-glass rounded-2xl p-5 flex items-start gap-4 hover:border-[rgba(255,153,51,0.2)] transition-all duration-300">

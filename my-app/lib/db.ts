@@ -24,6 +24,18 @@ export async function ensureTable() {
   await sql`ALTER TABLE registrations ADD COLUMN IF NOT EXISTS gender TEXT`;
   await sql`ALTER TABLE registrations ADD COLUMN IF NOT EXISTS accommodation TEXT`;
   await sql`ALTER TABLE registrations ADD COLUMN IF NOT EXISTS time_slot TEXT`;
+  // Remove duplicate registrations, keeping only the latest per email+competition
+  await sql`
+    DELETE FROM registrations
+    WHERE id NOT IN (
+      SELECT MAX(id) FROM registrations GROUP BY email, competition
+    )
+  `;
+  // Enforce uniqueness at DB level
+  await sql`
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_email_competition
+    ON registrations (email, competition)
+  `;
 }
 
 export async function ensureUsersTable() {
