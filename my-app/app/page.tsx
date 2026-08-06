@@ -47,13 +47,21 @@ function useCountdown(target: Date) {
 
 /* ─── data ─── */
 const timeline = [
-  { year: "1857", title: "First War of Independence", icon: "⚔️", color: "#FF9933", desc: "The Great Revolt of 1857 became the first major uprising against British colonial rule, igniting the flame of independence across India." },
-  { year: "1905", title: "Partition of Bengal & Swadeshi", icon: "🔥", color: "#FF9933", desc: "Lord Curzon's partition of Bengal sparked the Swadeshi movement — a powerful economic and cultural resistance that united Indians." },
-  { year: "1919", title: "Jallianwala Bagh Massacre", icon: "🕯️", color: "#FF9933", desc: "The massacre at Amritsar fuelled nationwide outrage and strengthened the resolve for complete independence under Mahatma Gandhi." },
-  { year: "1930", title: "Dandi Salt March", icon: "🚶", color: "#FFFFFF", desc: "Gandhi led 240 miles to the sea in defiance of the Salt Tax — one of the most iconic acts of civil disobedience in history." },
-  { year: "1942", title: "Quit India Movement", icon: "✊", color: "#138808", desc: "'Do or Die' — Gandhi's clarion call electrified the nation. Millions took to the streets demanding immediate British withdrawal." },
-  { year: "1947", title: "Independence at Midnight", icon: "🇮🇳", color: "#138808", desc: "At the stroke of midnight on 15 August 1947, India awoke to life and freedom. Nehru's 'Tryst with Destiny' speech echoed through history." },
-  { year: "2026", title: "80th Independence Day", icon: <AshokaCss size={32} color="#138808" />, color: "#138808", desc: "KL University honors 80 glorious years of freedom with pride, creativity, competitions, and the spirit of a new India." },
+  { year: "1857", title: "First War of Independence",            icon: "⚔️",  color: "#FF9933", desc: "The Great Revolt of 1857 became the first major uprising against British colonial rule, igniting the flame of independence across India." },
+  { year: "1905", title: "Partition of Bengal & Swadeshi",       icon: "🔥",  color: "#FF9933", desc: "Lord Curzon's partition of Bengal sparked the Swadeshi movement — a powerful economic and cultural resistance that united Indians." },
+  { year: "1919", title: "Jallianwala Bagh Massacre",            icon: "🕯️", color: "#FF9933", desc: "The massacre at Amritsar fuelled nationwide outrage and strengthened the resolve for complete independence under Mahatma Gandhi." },
+  { year: "1930", title: "Dandi Salt March",                     icon: "🚶",  color: "#FF9933", desc: "Gandhi led 240 miles to the sea in defiance of the Salt Tax — one of the most iconic acts of civil disobedience in history." },
+  { year: "1942", title: "Quit India Movement",                  icon: "✊",  color: "#FF9933", desc: "'Do or Die' — Gandhi's clarion call electrified the nation. Millions took to the streets demanding immediate British withdrawal." },
+  { year: "1947", title: "Independence at Midnight",             icon: "🇮🇳", color: "#FF9933", desc: "At the stroke of midnight on 15 August 1947, India awoke to life and freedom. Nehru's 'Tryst with Destiny' speech echoed through history." },
+  { year: "1950", title: "The Constitution Comes into Force",    icon: "📜",  color: "#FFFFFF", desc: "India became the world's largest democratic republic with the adoption of its Constitution on 26 January 1950." },
+  { year: "1960s–70s", title: "Green Revolution",               icon: "🌾",  color: "#FFFFFF", desc: "Scientific farming and modern agricultural practices transformed India into a food-secure nation." },
+  { year: "1975", title: "India Enters the Space Age",          icon: "🚀",  color: "#FFFFFF", desc: "ISRO launched Aryabhata, India's first satellite, beginning a remarkable journey in space exploration." },
+  { year: "1991", title: "Economic Liberalization",              icon: "💻",  color: "#138808", desc: "Major economic reforms opened India's markets, accelerating industrial growth, innovation, and global integration." },
+  { year: "2008", title: "Chandrayaan-1",                        icon: "🌕",  color: "#138808", desc: "India's first lunar mission confirmed the presence of water molecules on the Moon, earning global recognition." },
+  { year: "2014", title: "Mars Orbiter Mission (Mangalyaan)",    icon: "🛰️", color: "#138808", desc: "India became the first nation to successfully reach Mars orbit on its maiden attempt." },
+  { year: "2023", title: "Chandrayaan-3 Moon Landing",          icon: "🌖",  color: "#138808", desc: "India became the first country to land near the Moon's south pole, showcasing its technological excellence." },
+  { year: "2025", title: "Digital India & AI Innovation",        icon: "🤖",  color: "#138808", desc: "India emerged as a global leader in digital public infrastructure, AI innovation, startups, and technology-driven governance." },
+  { year: "2026", title: "80th Independence Day",                icon: <AshokaCss size={32} color="#138808" />, color: "#138808", desc: "KL University honors 80 glorious years of freedom with pride, creativity, competitions, and the spirit of a new India." },
 ];
 
 const stats = [
