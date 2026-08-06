@@ -20,6 +20,7 @@ const schedule: Record<string, { date: string; time: string; venue: string; icon
 interface Registration {
   id: number;
   competition: string;
+  time_slot: string | null;
   created_at: string;
   department: string;
   year: string;
@@ -159,7 +160,7 @@ export default function MyActivitiesPage() {
                     {info && (
                       <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-[#8888A8]">
                         <span>📅 {info.date}</span>
-                        <span>🕐 {info.time}</span>
+                        <span>🕐 {reg.time_slot ?? info.time}</span>
                         <span>📍 {info.venue}</span>
                       </div>
                     )}
