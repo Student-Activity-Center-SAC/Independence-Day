@@ -46,6 +46,12 @@ const EMPTY: ProfileForm = {
   gender: "", accommodation: "",
 };
 
+// Extract numeric student ID from KLU email (e.g. 2400030188@kluniversity.in → "2400030188")
+function extractIdFromEmail(email: string): string | null {
+  const match = email.match(/^(\d{4,11})@kluniversity\.in$/i);
+  return match ? match[1] : null;
+}
+
 export default function ProfilePage() {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -53,23 +59,30 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [checking, setChecking] = useState(true);
+  const [idFromEmail, setIdFromEmail] = useState(false); // true = ID was auto-extracted
 
   useEffect(() => {
     if (status === "unauthenticated") { router.replace("/login?from=/profile"); return; }
     if (status !== "authenticated") return;
 
-    // Check if profile already complete
+    // Auto-extract student ID from KLU email
+    const email = session?.user?.email ?? "";
+    const extractedId = extractIdFromEmail(email);
+    if (extractedId) {
+      setIdFromEmail(true);
+      setForm((f) => ({ ...f, idNumber: extractedId }));
+    }
+
+    // Load existing profile data to pre-fill the form
     fetch("/api/profile")
       .then((r) => r.json())
       .then((d) => {
-        if (d.user?.profile_complete) {
-          router.replace("/my-activities");
-        } else if (d.user) {
-          // Pre-fill existing partial data
-          const u = d.user;
+        const u = d.user;
+        if (u) {
+          // Pre-fill all existing data
           setForm((f) => ({
             ...f,
-            idNumber: u.id_number ?? "",
+            idNumber: u.id_number ?? extractedId ?? f.idNumber,
             phone: u.phone?.split(" ").slice(1).join("") ?? "",
             countryCode: u.phone?.split(" ")[0] ?? "+91",
             department: u.department ?? "",
@@ -80,13 +93,13 @@ export default function ProfilePage() {
         }
       })
       .finally(() => setChecking(false));
-  }, [status, router]);
+  }, [status, router, session]);
 
   const set = (key: keyof ProfileForm, val: string) =>
     setForm((f) => ({ ...f, [key]: val }));
 
   const validate = () => {
-    if (!/^\d{10,11}$/.test(form.idNumber)) return "ID Number must be 10–11 digits.";
+    if (!/^\d{4,11}$/.test(form.idNumber)) return "ID Number must be 4–11 digits.";
     if (!/^\d{10}$/.test(form.phone)) return "Phone number must be exactly 10 digits.";
     if (!form.department) return "Select your department.";
     if (form.department === "Other" && !form.otherDept.trim()) return "Enter your department name.";
@@ -162,7 +175,7 @@ export default function ProfilePage() {
           <p className="text-[#8888A8] text-sm">Fill in your details to start registering for events.</p>
         </div>
 
-        {/* Microsoft account info */}
+        {/* Microsoft account info — shows auto-filled name */}
         <div className="card-glass rounded-xl p-4 mb-6 flex items-center gap-3">
           <div className="w-9 h-9 rounded-full bg-[#FF9933]/15 border border-[#FF9933]/30 flex items-center justify-center text-sm font-bold text-[#FF9933] shrink-0">
             {session?.user?.name?.[0]?.toUpperCase() ?? "U"}
@@ -171,25 +184,46 @@ export default function ProfilePage() {
             <p className="text-white text-sm font-semibold truncate">{session?.user?.name}</p>
             <p className="text-[#8888A8] text-xs truncate">{session?.user?.email}</p>
           </div>
-          <div className="ml-auto shrink-0">
+          <div className="ml-auto shrink-0 flex flex-col items-end gap-1">
             <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#138808]/15 border border-[#138808]/30 text-[#138808] font-semibold">Verified</span>
+            {idFromEmail && (
+              <span className="text-[9px] px-2 py-0.5 rounded-full bg-[#FF9933]/10 border border-[#FF9933]/20 text-[#FF9933]">ID auto-filled</span>
+            )}
           </div>
         </div>
 
         <form onSubmit={handleSubmit} className="card-glass rounded-2xl p-6 space-y-5">
-          {/* ID Number */}
+          {/* ID Number — auto-filled from email if numeric student ID */}
           <div>
             <label className="block text-[10px] text-[#8888A8] uppercase tracking-wider mb-1.5">
               ID Number <span className="text-[#FF9933]">*</span>
+              {idFromEmail && (
+                <span className="ml-2 text-[#138808] normal-case tracking-normal">Auto-filled from your KLU email</span>
+              )}
             </label>
-            <input
-              type="text"
-              inputMode="numeric"
-              placeholder="e.g. 2400030188"
-              value={form.idNumber}
-              onChange={(e) => set("idNumber", e.target.value.replace(/\D/g, "").slice(0, 11))}
-              className="w-full bg-[#0D0D1A] border border-white/10 rounded-xl px-4 py-3 text-white placeholder-[#555577] text-sm focus:outline-none focus:border-[#FF9933]/50 transition-colors"
-            />
+            <div className="relative">
+              <input
+                type="text"
+                inputMode="numeric"
+                placeholder="e.g. 2400030188"
+                value={form.idNumber}
+                readOnly={idFromEmail}
+                onChange={(e) => !idFromEmail && set("idNumber", e.target.value.replace(/\D/g, "").slice(0, 11))}
+                className={`w-full bg-[#0D0D1A] border rounded-xl px-4 py-3 text-sm focus:outline-none transition-colors ${
+                  idFromEmail
+                    ? "border-[#138808]/30 text-[#138808] cursor-default select-none"
+                    : "border-white/10 text-white placeholder-[#555577] focus:border-[#FF9933]/50"
+                }`}
+              />
+              {idFromEmail && (
+                <div className="absolute right-3 top-1/2 -translate-y-1/2 text-[#138808]">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+              )}
+            </div>
+            {!idFromEmail && (
+              <p className="mt-1 text-[10px] text-[#555577]">Enter your KLU student ID (4–11 digits)</p>
+            )}
           </div>
 
           {/* Phone */}

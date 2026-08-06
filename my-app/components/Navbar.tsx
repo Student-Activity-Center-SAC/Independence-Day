@@ -99,6 +99,12 @@ export default function Navbar() {
               >
                 My Activities
               </Link>
+              <Link
+                href="/profile"
+                className={`text-sm font-medium tracking-wide transition-colors duration-300 ${pathname === "/profile" ? "text-[#FF9933]" : "text-white/60 hover:text-white"}`}
+              >
+                Profile
+              </Link>
               <button
                 onClick={() => signOut({ callbackUrl: "/" })}
                 className="px-4 py-2 text-sm font-bold rounded-full border border-white/15 text-white/60 hover:text-white hover:border-white/35 transition-all duration-300"
@@ -174,6 +180,13 @@ export default function Navbar() {
                   className="block py-3 text-center font-bold rounded-full bg-gradient-to-r from-[#FF9933] to-[#e68000] text-black text-sm"
                 >
                   My Activities
+                </Link>
+                <Link
+                  href="/profile"
+                  onClick={() => setOpen(false)}
+                  className="block py-3 text-center font-semibold rounded-full border border-[#FF9933]/40 text-[#FF9933] text-sm hover:bg-[#FF9933]/10 transition-colors"
+                >
+                  Profile
                 </Link>
                 <button
                   onClick={() => { setOpen(false); signOut({ callbackUrl: "/" }); }}
