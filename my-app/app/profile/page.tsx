@@ -59,6 +59,8 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [checking, setChecking] = useState(true);
+  const [profileComplete, setProfileComplete] = useState(false);
+  const [savedProfile, setSavedProfile] = useState<Record<string, string> | null>(null);
 
   // Derived — no state needed; recomputed whenever session changes
   const extractedId = extractIdFromEmail(session?.user?.email ?? "");
@@ -68,12 +70,14 @@ export default function ProfilePage() {
     if (status === "unauthenticated") { router.replace("/login?from=/profile"); return; }
     if (status !== "authenticated") return;
 
-    // Only async work in the effect — no synchronous setState
     fetch("/api/profile")
       .then((r) => r.json())
       .then((d) => {
         const u = d.user;
-        if (u) {
+        if (u?.profile_complete) {
+          setProfileComplete(true);
+          setSavedProfile(u);
+        } else if (u) {
           setForm((f) => ({
             ...f,
             idNumber: u.id_number ?? extractedId ?? f.idNumber,
@@ -128,7 +132,16 @@ export default function ProfilePage() {
 
     setSaving(false);
     if (res.ok) {
-      router.push("/my-activities");
+      const dept = form.department === "Other" ? form.otherDept.trim() : form.department;
+      setProfileComplete(true);
+      setSavedProfile({
+        id_number: idFromEmail ? (extractedId ?? form.idNumber) : form.idNumber,
+        phone: `${form.countryCode} ${form.phone}`,
+        department: dept,
+        year: form.year,
+        gender: form.gender,
+        accommodation: form.accommodation,
+      });
     } else {
       const d = await res.json();
       setError(d.error ?? "Failed to save profile.");
@@ -139,6 +152,68 @@ export default function ProfilePage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#07070E]">
         <div className="w-8 h-8 rounded-full border-2 border-[#FF9933] border-t-transparent animate-spin" />
+      </div>
+    );
+  }
+
+  if (profileComplete && savedProfile) {
+    const p = savedProfile;
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-[#0A0A15] to-[#07070E] pt-28 pb-16 px-4">
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[250px] bg-[#138808]/5 rounded-full blur-3xl pointer-events-none" />
+        <div className="relative max-w-md mx-auto">
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[#138808]/15 border border-[#138808]/40 mb-4">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#138808" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20 6L9 17l-5-5"/>
+              </svg>
+            </div>
+            <h1 className="font-[family-name:var(--font-cinzel)] text-2xl font-black text-white mb-2">Profile Saved</h1>
+            <p className="text-[#8888A8] text-sm">Your details are confirmed and locked.</p>
+          </div>
+
+          <div className="card-glass rounded-2xl overflow-hidden mb-6">
+            <div className="px-5 py-3 border-b border-white/6 flex items-center gap-2">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8888A8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              <span className="text-[10px] text-[#8888A8] uppercase tracking-widest font-semibold">Locked · Cannot be edited</span>
+            </div>
+            <div className="px-5 py-4">
+              <div className="flex items-center gap-3 mb-4 pb-4 border-b border-white/6">
+                <div className="w-10 h-10 rounded-full bg-[#FF9933]/15 border border-[#FF9933]/30 flex items-center justify-center text-[#FF9933] font-black text-sm shrink-0">
+                  {session?.user?.name?.[0]?.toUpperCase()}
+                </div>
+                <div className="min-w-0">
+                  <p className="text-white font-semibold text-sm truncate">{session?.user?.name}</p>
+                  <p className="text-[#8888A8] text-xs truncate">{session?.user?.email}</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { label: "ID Number",   value: p.id_number },
+                  { label: "Phone",       value: p.phone },
+                  { label: "Department",  value: p.department },
+                  { label: "Year",        value: p.year },
+                  { label: "Gender",      value: p.gender },
+                  { label: "Stay",        value: p.accommodation },
+                ].map(({ label, value }) => (
+                  <div key={label}>
+                    <p className="text-[9px] text-[#8888A8] uppercase tracking-wider mb-0.5">{label}</p>
+                    <p className="text-white text-sm font-medium">{value}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="flex gap-3">
+            <a href="/competitions" className="flex-1 py-3 rounded-xl bg-gradient-to-r from-[#FF9933] to-[#e68000] text-black text-sm font-bold text-center hover:shadow-[0_0_22px_rgba(255,153,51,0.4)] transition-all duration-300">
+              Browse Competitions →
+            </a>
+            <a href="/my-activities" className="flex-1 py-3 rounded-xl border border-white/12 text-white/70 text-sm font-semibold text-center hover:border-white/25 hover:text-white transition-all duration-300">
+              My Activities
+            </a>
+          </div>
+        </div>
       </div>
     );
   }

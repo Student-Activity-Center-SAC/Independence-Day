@@ -114,12 +114,9 @@ export default function MyActivitiesPage() {
                   ))}
                 </div>
               </div>
-              <Link
-                href="/profile"
-                className="shrink-0 text-[10px] px-3 py-1.5 rounded-lg border border-white/10 text-[#8888A8] hover:text-white hover:border-white/25 transition-all"
-              >
-                Edit
-              </Link>
+              <div className="shrink-0 flex items-center justify-center w-7 h-7 rounded-lg bg-[#138808]/15 border border-[#138808]/30">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#138808" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              </div>
             </div>
           </div>
         )}
