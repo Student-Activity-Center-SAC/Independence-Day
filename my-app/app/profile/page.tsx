@@ -59,27 +59,21 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [checking, setChecking] = useState(true);
-  const [idFromEmail, setIdFromEmail] = useState(false); // true = ID was auto-extracted
+
+  // Derived — no state needed; recomputed whenever session changes
+  const extractedId = extractIdFromEmail(session?.user?.email ?? "");
+  const idFromEmail = extractedId !== null;
 
   useEffect(() => {
     if (status === "unauthenticated") { router.replace("/login?from=/profile"); return; }
     if (status !== "authenticated") return;
 
-    // Auto-extract student ID from KLU email
-    const email = session?.user?.email ?? "";
-    const extractedId = extractIdFromEmail(email);
-    if (extractedId) {
-      setIdFromEmail(true);
-      setForm((f) => ({ ...f, idNumber: extractedId }));
-    }
-
-    // Load existing profile data to pre-fill the form
+    // Only async work in the effect — no synchronous setState
     fetch("/api/profile")
       .then((r) => r.json())
       .then((d) => {
         const u = d.user;
         if (u) {
-          // Pre-fill all existing data
           setForm((f) => ({
             ...f,
             idNumber: u.id_number ?? extractedId ?? f.idNumber,
@@ -93,13 +87,15 @@ export default function ProfilePage() {
         }
       })
       .finally(() => setChecking(false));
-  }, [status, router, session]);
+  }, [status, router, extractedId]);
 
   const set = (key: keyof ProfileForm, val: string) =>
     setForm((f) => ({ ...f, [key]: val }));
 
   const validate = () => {
-    if (!/^\d{4,11}$/.test(form.idNumber)) return "ID Number must be 4–11 digits.";
+    // Use extractedId (from email) as the authoritative value if available
+    const idToValidate = idFromEmail ? (extractedId ?? "") : form.idNumber;
+    if (!/^\d{4,11}$/.test(idToValidate)) return "ID Number must be 4–11 digits.";
     if (!/^\d{10}$/.test(form.phone)) return "Phone number must be exactly 10 digits.";
     if (!form.department) return "Select your department.";
     if (form.department === "Other" && !form.otherDept.trim()) return "Enter your department name.";
@@ -121,7 +117,7 @@ export default function ProfilePage() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        id_number: form.idNumber,
+        id_number: idFromEmail ? (extractedId ?? form.idNumber) : form.idNumber,
         phone: `${form.countryCode} ${form.phone}`,
         department: dept,
         year: form.year,
