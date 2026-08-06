@@ -278,10 +278,32 @@ export default function GalleryPage() {
       </AnimatePresence>
 
       {/* ── Footer ── */}
-      <footer className="py-10 border-t border-white/5 bg-[#07070E] text-center">
-        <div className="tricolor-line w-20 mx-auto mb-6 rounded-full" />
-        <p className="text-[#8888A8] text-sm">© 2026 KL University · Student Activity Centre</p>
-        <p className="text-[#8888A8]/40 text-xs mt-1">Jai Hind 🇮🇳</p>
+      <footer className="py-12 border-t border-white/8 bg-[#07070E] relative overflow-hidden text-center">
+        <div className="absolute inset-0 bg-gradient-to-t from-[rgba(255,153,51,0.03)] to-transparent pointer-events-none" />
+        <div className="relative z-10 max-w-7xl mx-auto px-6">
+          <div className="flex items-center justify-center gap-3 mb-6">
+            <div className="h-px flex-1 max-w-[80px] bg-gradient-to-r from-transparent to-[#FF9933]/40" />
+            <div className="flex gap-1">
+              <span className="w-2 h-2 rounded-full bg-[#FF9933]" />
+              <span className="w-2 h-2 rounded-full bg-white/60" />
+              <span className="w-2 h-2 rounded-full bg-[#138808]" />
+            </div>
+            <div className="h-px flex-1 max-w-[80px] bg-gradient-to-l from-transparent to-[#138808]/40" />
+          </div>
+          <p className="text-[#8888A8] text-sm mb-1 tracking-wide">© 2026 KL University · Student Activity Centre</p>
+          <p className="text-[#8888A8]/50 text-xs mb-6">Celebrating 80 Years of Independence · Jai Hind 🇮🇳</p>
+          <div className="border-t border-white/5 pt-5">
+            <p className="text-[#8888A8]/70 text-xs tracking-wide">
+              Designed &amp; Developed by{" "}
+              <a href="https://www.linkedin.com/in/singananischal/" target="_blank" rel="noopener noreferrer"
+                className="text-white font-medium hover:text-white/80 transition-colors duration-200 underline underline-offset-2 decoration-white/20 hover:decoration-white/50">
+                Nischal Singana
+              </a>
+              {" "}|{" "}
+              <span className="text-white/60">ZeroOne Code Club</span>
+            </p>
+          </div>
+        </div>
       </footer>
     </>
   );

@@ -3,6 +3,7 @@
 import { useRef, useState, useSyncExternalStore } from "react";
 import { motion, useInView, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 import AshokaCss from "@/components/AshokaCss";
 import ParticleCanvas from "@/components/ParticleCanvas";
 import WavingFlag from "@/components/WavingFlag";
@@ -91,6 +92,7 @@ function CBox({ n, label }: { n: number; label: string }) {
 }
 
 export default function HomePage() {
+  const { data: session } = useSession();
   const videoRef = useRef<HTMLVideoElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
   const [isMuted, setIsMuted] = useState(true);
@@ -152,7 +154,7 @@ export default function HomePage() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto px-4 sm:px-0 hero-enter-5">
-            <Link href="/register" className="px-8 py-3.5 rounded-full bg-gradient-to-r from-[#FF9933] to-[#e68000] text-black font-bold text-sm tracking-wide hover:shadow-[0_0_28px_rgba(255,153,51,0.5)] hover:-translate-y-0.5 transition-all duration-300 text-center">
+            <Link href={session ? "/competitions" : "/login"} className="px-8 py-3.5 rounded-full bg-gradient-to-r from-[#FF9933] to-[#e68000] text-black font-bold text-sm tracking-wide hover:shadow-[0_0_28px_rgba(255,153,51,0.5)] hover:-translate-y-0.5 transition-all duration-300 text-center">
               Register Now →
             </Link>
             <Link href="/competitions" className="px-8 py-3.5 rounded-full border border-white/25 text-white font-semibold text-sm tracking-wide hover:bg-white/8 hover:border-white/50 transition-all duration-300 text-center">
@@ -414,7 +416,7 @@ export default function HomePage() {
               Join competitions, showcase your talent, and earn certificates. Let&apos;s celebrate 80 years of freedom together as one!
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Link href="/register" className="px-10 py-4 rounded-full bg-gradient-to-r from-[#FF9933] to-[#e68000] text-black font-bold tracking-wide hover:shadow-[0_0_35px_rgba(255,153,51,0.4)] hover:-translate-y-1 transition-all duration-300 text-center">
+              <Link href={session ? "/competitions" : "/login"} className="px-10 py-4 rounded-full bg-gradient-to-r from-[#FF9933] to-[#e68000] text-black font-bold tracking-wide hover:shadow-[0_0_35px_rgba(255,153,51,0.4)] hover:-translate-y-1 transition-all duration-300 text-center">
                 Register for a Competition
               </Link>
               <Link href="/competitions" className="px-10 py-4 rounded-full border border-[#138808]/50 text-[#138808] font-semibold hover:bg-[#138808]/10 transition-all duration-300 text-center">
