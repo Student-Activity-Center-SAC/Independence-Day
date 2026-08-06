@@ -81,7 +81,9 @@ function StatCard({ label, value, sub, color }: { label: string; value: string |
 
 /* ── Main ── */
 export default function AdminPage() {
-  const [key, setKey] = useState("");
+  const [key, setKey] = useState(() =>
+    typeof window !== "undefined" ? sessionStorage.getItem("admin_key") ?? "" : ""
+  );
   const [inputKey, setInputKey] = useState("");
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(false);
@@ -134,7 +136,9 @@ export default function AdminPage() {
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputKey.trim()) return;
-    setKey(inputKey.trim());
+    const k = inputKey.trim();
+    sessionStorage.setItem("admin_key", k);
+    setKey(k);
   };
 
   // ── Login screen ──
@@ -271,7 +275,7 @@ export default function AdminPage() {
               ↻ Refresh
             </button>
             <button
-              onClick={() => { setKey(""); setStats(null); }}
+              onClick={() => { sessionStorage.removeItem("admin_key"); setKey(""); setStats(null); }}
               className="text-xs px-3 py-1.5 rounded-lg border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-all"
             >
               Logout

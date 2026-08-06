@@ -18,12 +18,14 @@ export default function Navbar() {
   const pathname = usePathname();
 
   useEffect(() => {
-    /* Show logo only after scrolling past the hero video area */
+    if (pathname === "/admin") return;
     const fn = () => setScrolled(window.scrollY > 120);
     fn();
     window.addEventListener("scroll", fn, { passive: true });
     return () => window.removeEventListener("scroll", fn);
-  }, []);
+  }, [pathname]);
+
+  if (pathname === "/admin") return null;
 
   return (
     <header

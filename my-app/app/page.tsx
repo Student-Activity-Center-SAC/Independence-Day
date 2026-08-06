@@ -19,9 +19,10 @@ function useCountdown(target: Date) {
       seconds: Math.floor((diff % 60000) / 1000),
     };
   };
-  /* Start with zeros — SSR and initial client render match; real values set in effect */
-  const [cd, setCd] = useState(() => calc());
+  /* Zeros on server + first client render so SSR HTML matches; real value set in effect */
+  const [cd, setCd] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   useEffect(() => {
+    setCd(calc());
     const id = setInterval(() => setCd(calc()), 1000);
     return () => clearInterval(id);
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -42,8 +43,8 @@ const timeline = [
 
 const stats = [
   { value: "80", label: "Years of Freedom", suffix: "" },
-  { value: "9", label: "Competitions", suffix: "+" },
-  { value: "11", label: "Clubs", suffix: "" },
+  { value: "9", label: "Competitions", suffix: "" },
+  { value: "8", label: "Clubs", suffix: "" },
   { value: "15", label: "August 2026", suffix: "" },
 ];
 
