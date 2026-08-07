@@ -16,11 +16,12 @@ const schedule = [
   { date: "12 Aug 2026", day: "Wednesday", time: "03:20 PM – 05:20 PM", domain: "Music Club", competition: "Voices of India – Patriotic Singing Competition", venue: "R&D Theatre", icon: "🎤", color: "#FF9933", id: "music" },
   { date: "12 Aug 2026", day: "Wednesday", time: "03:20 PM – 05:20 PM", domain: "Fashion Club", competition: "Patriotic Attire Showcase – Unity in Diversity", venue: "New Seminar Hall", icon: "👘", color: "#FF9933", id: "fashion" },
   { date: "13 Aug 2026", day: "Thursday", time: "03:20 PM – 05:20 PM", domain: "Dance Club", competition: "Rhythms of Freedom – Patriotic Dance Competition", venue: "New Seminar Hall", icon: "💃", color: "#138808", id: "dance" },
-  { date: "13 Aug 2026", day: "Thursday", time: "03:20 PM – 05:20 PM", domain: "Yoga Club", competition: "Yoga for the Nation – Patriotic Yoga Session", venue: "Open Air Theatre (OAT)", icon: "🧘", color: "#138808", id: "yoga" },
+  { date: "13 Aug 2026", day: "Thursday", time: "03:30 PM – 05:20 PM", domain: "Yoga Club", competition: "Yoga for the Nation – Patriotic Yoga Session", venue: "Open Air Theatre (OAT)", icon: "🧘", color: "#138808", id: "yoga" },
   { date: "15 Aug 2026", day: "Saturday", time: "During Independence Day Celebrations", domain: "—", competition: "Prize Distribution & Felicitation Ceremony", venue: "Open Air Theatre (OAT)", icon: "🏆", color: "#FFD700", id: "prize" },
 ];
 
 const EVENT_SLOTS = ["11:00 AM – 1:00 PM", "3:30 PM – 5:30 PM"];
+const SINGLE_SLOT_IDS = new Set(["marathon", "photography", "yoga"]);
 
 const benefits = [
   "Automatically generated E-Certificate through the registration portal after successful verification.",
@@ -136,7 +137,7 @@ export default function CompetitionsPage() {
                             <span className="text-xs font-bold px-2.5 py-0.5 rounded-full" style={{ background: `${ev.color}22`, color: ev.color }}>
                               {ev.domain}
                             </span>
-                            {ev.id === "marathon" ? (
+                            {SINGLE_SLOT_IDS.has(ev.id) ? (
                               <span className="text-xs text-[#8888A8]">{ev.time}</span>
                             ) : (
                               <div className="flex items-center gap-1.5 flex-wrap">
@@ -176,7 +177,7 @@ export default function CompetitionsPage() {
                                 <div>
                                   <p className="text-[10px] text-[#8888A8] uppercase tracking-wider mb-1">Date & Time</p>
                                   <p className="text-white font-medium">{date}</p>
-                                  {ev.id === "marathon" ? (
+                                  {SINGLE_SLOT_IDS.has(ev.id) ? (
                                     <p className="text-[#8888A8] text-sm">{ev.time}</p>
                                   ) : (
                                     <div className="space-y-1 mt-1">

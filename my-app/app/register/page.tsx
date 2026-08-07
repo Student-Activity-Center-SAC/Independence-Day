@@ -19,8 +19,13 @@ const competitions = [
   "Yoga for the Nation – Patriotic Yoga Session",
 ];
 
-const MARATHON = "Run for the Nation – 2K Independence Day Marathon";
-const isMarathon = (c: string) => c === MARATHON;
+const SINGLE_SLOT_COMPETITIONS: Record<string, string> = {
+  "Run for the Nation – 2K Independence Day Marathon": "05:30 AM – 06:30 AM",
+  "Frames of Freedom – Patriotic Photography Outreach Competition": "10:00 AM – 12:20 PM",
+  "Yoga for the Nation – Patriotic Yoga Session": "3:30 PM – 5:20 PM",
+};
+const isSingleSlot = (c: string) => c in SINGLE_SLOT_COMPETITIONS;
+
 const SLOTS = [
   { id: "morning", label: "Slot 1 – Morning", time: "11:00 AM – 1:00 PM" },
   { id: "afternoon", label: "Slot 2 – Afternoon", time: "3:30 PM – 5:30 PM" },
@@ -60,7 +65,7 @@ function FastTrackRegister({
 
   async function confirm() {
     if (!competition) return;
-    if (!isMarathon(competition) && !timeSlot) return;
+    if (!isSingleSlot(competition) && !timeSlot) return;
     setSubmitting(true);
     setSubmitError("");
     try {
@@ -77,7 +82,7 @@ function FastTrackRegister({
           year: profile.year,
           accommodation: profile.accommodation,
           competition,
-          time_slot: isMarathon(competition) ? null : timeSlot,
+          time_slot: isSingleSlot(competition) ? SINGLE_SLOT_COMPETITIONS[competition] : timeSlot,
         }),
       });
       if (!res.ok) { const d = await res.json(); throw new Error(d.error ?? "Registration failed"); }
@@ -144,7 +149,7 @@ function FastTrackRegister({
           <div>
             <p className="text-[#FF9933] text-xs font-bold uppercase tracking-wide mb-1">Time Slots</p>
             <p className="text-[#A0A0B8] text-xs leading-relaxed">
-              All competitions (except Marathon) are conducted in <strong className="text-white">2 time slots</strong>. Students can register in <strong className="text-white">either</strong> of the time slots:
+              Most competitions are conducted in <strong className="text-white">2 time slots</strong> — students can register in <strong className="text-white">either</strong>. Marathon, Photography &amp; Yoga have a fixed single slot.
             </p>
             <div className="flex gap-3 mt-2">
               <span className="px-2.5 py-1 rounded-full bg-white/8 text-white text-[10px] font-semibold border border-white/10">11:00 AM – 1:00 PM</span>
@@ -185,7 +190,7 @@ function FastTrackRegister({
           )}
         </div>
 
-        {competition && !isMarathon(competition) && (
+        {competition && !isSingleSlot(competition) && (
           <div className="card-glass rounded-2xl p-5 sm:p-6 mb-5">
             <h2 className="font-[family-name:var(--font-cinzel)] text-base font-bold text-white mb-1">Choose Your Time Slot</h2>
             <p className="text-[#8888A8] text-xs mb-4">Select either slot — both are equally valid</p>
@@ -256,7 +261,7 @@ function FastTrackRegister({
 
         <button
           onClick={confirm}
-          disabled={!competition || (!isMarathon(competition) && !timeSlot) || !agreed || submitting}
+          disabled={!competition || (!isSingleSlot(competition) && !timeSlot) || !agreed || submitting}
           className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#FF9933] to-[#e68000] text-black text-sm font-black tracking-wide disabled:opacity-40 disabled:cursor-not-allowed hover:shadow-[0_0_28px_rgba(255,153,51,0.45)] transition-all duration-300"
         >
           {submitting ? "Registering…" : "Confirm Registration 🇮🇳"}

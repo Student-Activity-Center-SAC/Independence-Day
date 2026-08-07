@@ -14,7 +14,7 @@ const schedule: Record<string, { date: string; time: string; venue: string; icon
   "Voices of India – Patriotic Singing Competition":       { date: "12 Aug 2026", time: "03:20 PM – 05:20 PM", venue: "R&D Theatre", icon: "🎤" },
   "Patriotic Attire Showcase – Unity in Diversity":        { date: "12 Aug 2026", time: "03:20 PM – 05:20 PM", venue: "New Seminar Hall", icon: "👘" },
   "Rhythms of Freedom – Patriotic Dance Competition":      { date: "13 Aug 2026", time: "03:20 PM – 05:20 PM", venue: "New Seminar Hall", icon: "💃" },
-  "Yoga for the Nation – Patriotic Yoga Session":          { date: "13 Aug 2026", time: "03:20 PM – 05:20 PM", venue: "Open Air Theatre (OAT)", icon: "🧘" },
+  "Yoga for the Nation – Patriotic Yoga Session":          { date: "13 Aug 2026", time: "03:30 PM – 05:20 PM", venue: "Open Air Theatre (OAT)", icon: "🧘" },
 };
 
 interface Registration {
