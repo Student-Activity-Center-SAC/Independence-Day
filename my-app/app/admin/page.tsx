@@ -5,6 +5,19 @@ import AshokaCss from "@/components/AshokaCss";
 import * as XLSX from "xlsx";
 
 /* ── Types ── */
+interface ExportRow {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  roll_number: string;
+  department: string;
+  year: string;
+  competition: string;
+  time_slot: string | null;
+  registered_at: string;
+}
+
 interface Stats {
   total: number;
   byCompetition: { competition: string; count: number }[];
@@ -218,39 +231,49 @@ export default function AdminPage() {
     else { setSortField(field); setSortDir("desc"); }
   };
 
-  const exportCSV = () => {
+  const fetchExportRows = async (competition: string): Promise<ExportRow[]> => {
+    const params = new URLSearchParams({ key });
+    if (competition !== "All") params.set("competition", competition);
+    const res = await fetch(`/api/admin/export?${params}`);
+    if (!res.ok) { alert("Export failed"); return []; }
+    const data = await res.json();
+    return data.rows ?? [];
+  };
+
+  const downloadCSV = async (competition: string) => {
+    const rows = await fetchExportRows(competition);
+    if (!rows.length) { alert("No registrations found"); return; }
     const headers = ["ID", "Name", "Email", "Phone", "Roll No", "Department", "Year", "Competition", "Time Slot", "Registered At"];
-    const rows = filtered.map((r) => [r.id, r.name, r.email, r.phone, r.roll_number, r.department, r.year, r.competition, r.time_slot ?? "—", r.registered_at]);
-    const csv = [headers, ...rows].map((r) => r.map((v) => `"${v}"`).join(",")).join("\n");
+    const body = rows.map((r) => [r.id, r.name, r.email, r.phone, r.roll_number, r.department, r.year, r.competition, r.time_slot ?? "—", r.registered_at]);
+    const csv = [headers, ...body].map((row) => row.map((v) => `"${String(v)}"`).join(",")).join("\n");
     const blob = new Blob([csv], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement("a"); a.href = url; a.download = "registrations.csv"; a.click();
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${competition === "All" ? "all_registrations" : competition.replace(/[^a-z0-9]/gi, "_").toLowerCase()}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
-  const exportXLSX = () => {
+  const downloadXLSX = async (competition: string) => {
+    const rows = await fetchExportRows(competition);
+    if (!rows.length) { alert("No registrations found"); return; }
     const headers = ["ID", "Name", "Email", "Phone", "Roll No", "Department", "Year", "Competition", "Time Slot", "Registered At"];
-    const rows = filtered.map((r) => [r.id, r.name, r.email, r.phone, r.roll_number, r.department, r.year, r.competition, r.time_slot ?? "—", r.registered_at]);
-
+    const body = rows.map((r) => [r.id, r.name, r.email, r.phone, r.roll_number, r.department, r.year, r.competition, r.time_slot ?? "—", r.registered_at]);
     const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
-
-    // Column widths
+    const ws = XLSX.utils.aoa_to_sheet([headers, ...body]);
     ws["!cols"] = [
-      { wch: 6 },  // ID
-      { wch: 22 }, // Name
-      { wch: 30 }, // Email
-      { wch: 14 }, // Phone
-      { wch: 14 }, // Roll No
-      { wch: 16 }, // Department
-      { wch: 10 }, // Year
-      { wch: 22 }, // Competition
-      { wch: 18 }, // Time Slot
-      { wch: 22 }, // Registered At
+      { wch: 6 }, { wch: 22 }, { wch: 30 }, { wch: 14 }, { wch: 14 },
+      { wch: 16 }, { wch: 10 }, { wch: 42 }, { wch: 18 }, { wch: 22 },
     ];
-
-    XLSX.utils.book_append_sheet(wb, ws, "Registrations");
-    XLSX.writeFile(wb, `registrations_${new Date().toISOString().slice(0, 10)}.xlsx`);
+    const sheetName = competition === "All" ? "All" : competition.slice(0, 31);
+    XLSX.utils.book_append_sheet(wb, ws, sheetName);
+    const filename = competition === "All" ? "all_registrations" : competition.replace(/[^a-z0-9]/gi, "_").toLowerCase();
+    XLSX.writeFile(wb, `${filename}_${new Date().toISOString().slice(0, 10)}.xlsx`);
   };
+
+  const exportCSV = () => downloadCSV(filterComp);
+  const exportXLSX = () => downloadXLSX(filterComp);
 
   return (
     <div className="min-h-screen bg-[#07070E] text-white">
@@ -343,6 +366,54 @@ export default function AdminPage() {
             ) : (
               <div className="h-16 flex items-center justify-center text-[#8888A8] text-xs">No data yet</div>
             )}
+          </div>
+        </div>
+
+        {/* ── Download by Competition ── */}
+        <div className="rounded-2xl border border-white/8 bg-[#0F0F1A] p-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+            <h2 className="font-bold text-white flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-[#FF9933]" /> Download by Competition
+            </h2>
+            <div className="flex gap-2">
+              <button
+                onClick={() => downloadCSV("All")}
+                className="text-xs px-3 py-1.5 rounded-lg border border-[#138808]/40 text-[#138808] hover:bg-[#138808]/10 transition-all font-medium"
+              >
+                ↓ All CSV
+              </button>
+              <button
+                onClick={() => downloadXLSX("All")}
+                className="text-xs px-3 py-1.5 rounded-lg border border-[#FF9933]/40 text-[#FF9933] hover:bg-[#FF9933]/10 transition-all font-medium"
+              >
+                ↓ All XLSX
+              </button>
+            </div>
+          </div>
+          <div className="space-y-2">
+            {(stats?.byCompetition ?? []).map((c) => (
+              <div
+                key={c.competition}
+                className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-white/3 border border-white/6 hover:border-white/12 transition-all"
+              >
+                <span className="text-[#FF9933] text-xs font-bold w-7 text-right shrink-0">{c.count}</span>
+                <span className="text-white text-xs flex-1 truncate">{c.competition}</span>
+                <div className="flex gap-2 shrink-0">
+                  <button
+                    onClick={() => downloadCSV(c.competition)}
+                    className="text-[10px] px-2.5 py-1 rounded-lg border border-[#138808]/40 text-[#138808] hover:bg-[#138808]/10 transition-all font-medium"
+                  >
+                    CSV
+                  </button>
+                  <button
+                    onClick={() => downloadXLSX(c.competition)}
+                    className="text-[10px] px-2.5 py-1 rounded-lg border border-[#FF9933]/40 text-[#FF9933] hover:bg-[#FF9933]/10 transition-all font-medium"
+                  >
+                    XLSX
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
